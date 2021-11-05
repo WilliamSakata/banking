@@ -1,2 +1,6 @@
 .idea
 mysql
+/vendor/
+/coverage
+/composer.lock
+.phpunit.result.cache

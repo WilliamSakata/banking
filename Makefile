@@ -1,11 +1,13 @@
-DOCKER_RUN = docker run --rm -it -v ${PWD}:/app -w /app gustavofreze/php:8.0.6
+DOCKER_RUN = docker run --rm -it -v ${PWD}:/app -w /app gustavofreze/php:8.0.6-fpm
 
 configure:
-	@${DOCKER_RUN} composer update
-	#@${DOCKER_RUN} composer update --optimize-autoloader --ignore-platform-reqs
+	@${DOCKER_RUN} composer update --optimize-autoloader
 
 test:
 	@${DOCKER_RUN} composer test
+
+test-location:
+	@${DOCKER_RUN} composer test ${LOCATION}
 
 clean:
 	rm -rf vendor report *.lock .phpunit.result.cache
@@ -19,13 +21,5 @@ up:
 build:
 	docker-compose build --no-cache bank-account
 
-#kill:
-#	docker-compose kill
-#
 restart:
 	docker-compose kill && docker-compose up -d
-
-#logs:
-#	docker-compose -f ./docker-compose.yml logs --tail=0 --follow
-
-
