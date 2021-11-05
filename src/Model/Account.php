@@ -5,6 +5,9 @@ namespace Banking\Account\Model;
 use Banking\Account\Command\Create\Create;
 use Banking\Account\Command\Deposit\Deposit;
 use Banking\Account\Command\Withdraw\Withdraw;
+use Banking\Account\Model\ValueObject\Amount;
+use Banking\Account\Model\ValueObject\Balance;
+use Banking\Account\Model\ValueObject\Currency;
 use DateTimeImmutable;
 use DomainException;
 use Exception;
@@ -41,7 +44,7 @@ final class Account implements EventSourcingRoot
      */
     public function create(Create $create): void
     {
-        $event = new AccountCreated($create->getDocument(), new Amount(0.0), new DateTimeImmutable());
+        $event = new AccountCreated($create->getDocument(), new Amount(0.0, new Currency('BRL')), new DateTimeImmutable());
 
         $this->when($event, $this->identity);
     }
@@ -67,12 +70,12 @@ final class Account implements EventSourcingRoot
             throw new DomainException('Saldo insuficiente');
         }
 
-        $amount = new Amount($withdraw->getAmount()->getValue() * -1);
+        $amount = new Amount($withdraw->getAmount()->getValue() * -1, $withdraw->getAmount()->getCurrency());
         $this->financialTransaction = new FinancialTransaction(new DateTimeImmutable(), $amount);
 
-        $balance = new Balance($this->balance->getValue() - $withdraw->getAmount()->getValue());
+        $balance = new Balance($this->balance->getAmount() - $withdraw->getAmount()->getValue());
 
-        $event = new WithdrawPerformed($withdraw->getDocument(), new Amount($balance->getValue()), new DateTimeImmutable());
+        $event = new WithdrawPerformed($withdraw->getDocument(), new Amount($balance->getAmount(), $withdraw->getAmount()->getCurrency()), new DateTimeImmutable());
         $this->when($event, $this->identity);
     }
 
@@ -93,7 +96,7 @@ final class Account implements EventSourcingRoot
      */
     private function withoutBalance(Amount $value): bool
     {
-        if ($this->balance->getValue() < $value->getValue()) {
+        if ($this->balance->getAmount() < $value->getValue()) {
             return true;
         }
 
@@ -110,7 +113,7 @@ final class Account implements EventSourcingRoot
         }
 
         //$this->financialTransaction = new FinancialTransaction(new DateTimeImmutable(), $deposit->getAmount());
-        $this->balance = new Balance($this->balance->getValue() + $deposit->getAmount()->getValue());
+        $this->balance = new Balance($this->balance->getAmount() + $deposit->getAmount()->getValue());
     }
 
     public function getIdentity(): Identity

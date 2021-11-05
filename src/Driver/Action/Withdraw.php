@@ -4,8 +4,9 @@ namespace Banking\Account\Driver\Action;
 
 use Banking\Account\Command\Withdraw\Withdraw as WithdrawUseCase;
 use Banking\Account\Command\Withdraw\WithdrawHandler;
-use Banking\Account\Model\Amount;
+use Banking\Account\Model\ValueObject\Amount;
 use Banking\Account\Model\Cpf;
+use Banking\Account\Model\ValueObject\Currency;
 use Exception;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -33,7 +34,7 @@ class Withdraw
 
         $withdraw = new WithdrawUseCase(
             new Cpf($payload['cpf']),
-            new Amount($payload['amount'])
+            new Amount($payload['amount'], new Currency('BRL'))
         );
 
         $this->handler->__invoke($withdraw);

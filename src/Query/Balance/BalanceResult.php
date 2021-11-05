@@ -2,7 +2,7 @@
 
 namespace Banking\Account\Query\Balance;
 
-use Banking\Account\Model\Amount;
+use Banking\Account\Model\ValueObject\Amount;
 use Banking\Account\Model\Cpf;
 
 class BalanceResult

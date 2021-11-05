@@ -3,8 +3,9 @@
 namespace Banking\Account\Query\Balance;
 
 use Banking\Account\Driven\Database\AccountDao;
-use Banking\Account\Model\Amount;
+use Banking\Account\Model\ValueObject\Amount;
 use Banking\Account\Model\Cpf;
+use Banking\Account\Model\ValueObject\Currency;
 use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Exception;
 
@@ -29,6 +30,6 @@ class BalanceHandler
 
         $result = $this->accountDao->findAccountBalanceById($balanceUseCase);
 
-        return new BalanceResult(new Cpf($result['accountId']), new Amount($result['balance']));
+        return new BalanceResult(new Cpf($result['accountId']), new Amount($result['balance'], new Currency('BRL')));
     }
 }
