@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  reverse-proxy:
+    container_name: 'reverse-proxy'
+    image: traefik:v2.4
+    restart: always
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.mysql.address=:3306"
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "3306:3306"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  mysql:
+    container_name: 'mysql'
+    image: mysql:5.7
+    volumes:
+      - ./mysql:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: dev
+      MYSQL_DATABASE: bank
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: dev
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.mysql.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.mysql.entrypoints=mysql"
+      - "traefik.tcp.services.mysql.loadbalancer.server.port=3306"
+
+  bank-account:
+    container_name: bank-account
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - mysql
+    links:
+      - "mysql:database.localhost"
+    volumes:
+      - ./:/app
+
+  account-nginx:
+    image: nginx:latest
+    container_name: account-nginx
+    restart: always
+    volumes:
+      - ./config:/etc/nginx/conf.d
+    depends_on:
+      - bank-account
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.account-nginx.rule=Host(`account.localhost`)"
+      - "traefik.http.routers.account-nginx.entrypoints=web"
