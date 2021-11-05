@@ -16,17 +16,16 @@
     "doctrine/dbal": "^2.10",
     "php-di/php-di": "^6.0",
     "php-di/slim-bridge": "3.1.1",
-    "phpunit/phpunit": "9.5.9",
-    "ext-http": "*"
+    "phpunit/phpunit": "9.5.9"
   },
   "autoload": {
     "psr-4": {
-      "Banking\\Account\\": "src"
+      "Banking\\Account\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Banking\\Account\\": "tests"
+      "Banking\\Account\\": "tests/"
     }
   },
   "scripts": {
