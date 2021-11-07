@@ -13,11 +13,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
-    - name: configure
+
+    - name: Change owner user
+      run: make change-owner
+
+    - name: Configure application
       run: make configure
       
-    - name: Up
+    - name: Deploy application
       run: make up
       
     - name: Run tests
