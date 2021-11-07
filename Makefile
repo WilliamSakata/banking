@@ -1,4 +1,4 @@
-DOCKER_RUN = docker run --rm -i -v ${PWD}:/app -w /app gustavofreze/php:8.0.6-fpm
+DOCKER_RUN = docker run -u root --rm -i -v ${PWD}:/app -w /app gustavofreze/php:8.0.6-fpm
 
 configure:
 	@${DOCKER_RUN} composer update --optimize-autoloader
