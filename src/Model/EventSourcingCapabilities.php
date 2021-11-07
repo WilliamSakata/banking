@@ -111,10 +111,6 @@ trait EventSourcingCapabilities
     /**
      * @param DomainEvent $event
      * @return string
-     * @todo Cache de objetos reflection ?
-     *
-     * https://gist.github.com/mindplay-dk/3359812
-     *
      */
     private function onEventName(DomainEvent $event): string
     {
