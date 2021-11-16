@@ -22,7 +22,7 @@ class CreateHandler
     public function __invoke(Create $create)
     {
         $account = Account::blank($create->getDocument());
-        $account->create($create);
+        $account->create();
         $this->accountRepository->push($account);
     }
 }

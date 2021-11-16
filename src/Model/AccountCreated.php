@@ -2,7 +2,7 @@
 
 namespace Banking\Account\Model;
 
-use Banking\Account\Model\ValueObject\Amount;
+use Banking\Account\Model\BuildingBlocks\DomainEvent;
 use DateTimeImmutable;
 
 class AccountCreated implements DomainEvent
@@ -45,5 +45,15 @@ class AccountCreated implements DomainEvent
     public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
+    }
+
+    public function getRevision(): int
+    {
+        return 1;
+    }
+
+    public function getAggregateType(): string
+    {
+        return AccountCreated::class;
     }
 }

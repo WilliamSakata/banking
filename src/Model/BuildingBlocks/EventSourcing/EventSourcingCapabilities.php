@@ -1,75 +1,65 @@
 <?php
 
-namespace Banking\Account\Model;
+namespace Banking\Account\Model\BuildingBlocks\EventSourcing;
 
+use Banking\Account\Model\BuildingBlocks\DomainEvent;
+use Banking\Account\Model\BuildingBlocks\EntityCapabilities;
+use Banking\Account\Model\BuildingBlocks\Identity;
+use Banking\Account\Model\BuildingBlocks\Version;
 use Exception;
 use ReflectionClass;
+use Ramsey\Uuid\Uuid;
 
 trait EventSourcingCapabilities
 {
-    /**
-     * Lista de eventos de domínio disparados pelo agregado enquanto objeto em memória
-     *
-     * @var array
-     */
-    private array $recordedEvents;
-    private Identity $identity;
+    use EntityCapabilities;
 
     /**
-     * Construtor deve ser protegido pois o agregado deve ser instanciado através do método
-     * blank visando aplicar eventos ao invés de valores
-     *
+     * @var EventRecordCollection
+     */
+    private EventRecordCollection $recordedEvents;
+
+    /**
      * @param Identity $identity
+     * @param Version $sequenceNumber
      */
-    private function __construct(Identity $identity)
+    private function __construct(private Identity $identity, private Version $sequenceNumber)
     {
-        $this->recordedEvents = [];
-
-        $this->identity = $identity;
+        $this->{$this->getIdentityName()} = $this->identity;
     }
 
     /**
-     * Recupera Stream eventos (eventos em memória) que ocorreram com o agregado após sua construção.
-     *
-     * @return array
+     * @return EventRecordCollection
      */
-    public function getRecordedEvents(): array
+    public function getRecordedEvents(): EventRecordCollection
     {
         return $this->recordedEvents;
     }
 
     /**
-     * Retorna instância do agregado com estado em "branco"
-     *
      * @param Identity $identity
-     * @return static|EventSourcingRoot
-     * @noinspection PhpDocSignatureInspection
+     * @return EventSourcingRoot
      */
     public static function blank(Identity $identity): EventSourcingRoot
     {
-        return new static($identity);
+        return new static($identity, new Version(0));
     }
 
     /**
-     * Reconstitui o estado do agregado aplicando uma lista de eventos salvos no event store
-     *
-     * @param Identity              $identity
+     * @param Identity $identity
      * @param EventRecordCollection $records
-     * @return static|EventSourcingRoot
-     * @noinspection PhpDocSignatureInspection
+     * @return EventSourcingRoot
      */
     public static function reconstitute(Identity $identity, EventRecordCollection $records): EventSourcingRoot
     {
-        $entity = static::blank($identity);
+        $aggregate = static::blank($identity);
 
-        /**
-         * @var $record EventRecord
-         */
+        /** @var EventRecord[] $records */
         foreach ($records as $record) {
-            $entity->applyEvent($record);
+            $aggregate->applyEvent($record);
         }
 
-        return $entity;
+        return $aggregate;
     }
 
     /**
@@ -80,10 +70,7 @@ trait EventSourcingCapabilities
      */
     protected function when(DomainEvent $event, Identity $identity)
     {
-        $record = new EventRecord(
-            $event,
-            $identity
-        );
+        $record = new EventRecord(Uuid::uuid4()->toString(), $event, $event->getRevision(), );
 
         $this->applyEvent($record);
         $this->recordEvent($record);
@@ -104,7 +91,7 @@ trait EventSourcingCapabilities
      */
     private function applyEvent(EventRecord $record)
     {
-        $method = $this->onEventName($record->getDomainEvent()); // When{EventName}
+        $method = $this->onEventName($record->getDomainEvent());
         $this->$method($record->getDomainEvent());
     }
 

@@ -10,7 +10,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 class AccountStatement
 {
-
     /**
      * @param AccountStatementHandler $handler
      */

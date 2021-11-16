@@ -3,9 +3,9 @@
 namespace Banking\Account\Query\Balance;
 
 use Banking\Account\Driven\Database\AccountDao;
-use Banking\Account\Model\ValueObject\Amount;
+use Banking\Account\Model\Amount;
 use Banking\Account\Model\Cpf;
-use Banking\Account\Model\ValueObject\Currency;
+use Banking\Account\Model\Currency;
 use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Exception;
 

@@ -2,12 +2,10 @@
 
 namespace Banking\Account\Model;
 
-use Banking\Account\Model\ValueObject\Amount;
 use DateTimeImmutable;
 
 final class FinancialTransaction
 {
-
     /**
      * @param DateTimeImmutable $date
      * @param Amount $transactionValue

@@ -4,6 +4,7 @@ namespace Banking\Account\Driven\Persistence;
 
 use Banking\Account\Model\Account;
 use Banking\Account\Model\AccountRepository as Repository;
+use Banking\Account\Model\BuildingBlocks\EventSourcing\EventRecord;
 use Banking\Account\Model\Cpf;
 use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Exception;
@@ -44,6 +45,19 @@ class AccountRepository implements Repository
     public function push(Account $account): void
     {
         try {
+            /** @var EventRecord $recordedEvent */
+            foreach ($account->getRecordedEvents() as $recordedEvent) {
+                $this->adapter->beginTransaction();
+
+                $builder = $this->adapter->createQueryBuilder();
+
+                $builder->insert('account_events')
+                    ->setValue('code', ':code')
+                    ->setValue('payload', ':payload')
+                    ->setValue('occurredOn', ':occurredOn')
+                    ->setParameter(':code', $recordedEvent->getIdentity())
+                    ->setParameter(':amount', $recordedEvent->getDomainEvent());
+            }
             $this->adapter->beginTransaction();
 
             $builder = $this->adapter->createQueryBuilder();

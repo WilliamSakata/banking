@@ -2,15 +2,15 @@
 
 namespace Banking\Account\Model;
 
-use Banking\Account\Command\Create\Create;
 use Banking\Account\Command\Deposit\Deposit;
 use Banking\Account\Command\Withdraw\Withdraw;
-use Banking\Account\Model\ValueObject\Amount;
-use Banking\Account\Model\ValueObject\Balance;
-use Banking\Account\Model\ValueObject\Currency;
+use Banking\Account\Model\BuildingBlocks\EventSourcing\EventSourcingCapabilities;
+use Banking\Account\Model\BuildingBlocks\EventSourcing\EventSourcingRoot;
+use Banking\Account\Model\BuildingBlocks\Identity;
 use DateTimeImmutable;
 use DomainException;
 use Exception;
+use ReflectionException;
 
 final class Account implements EventSourcingRoot
 {
@@ -39,12 +39,11 @@ final class Account implements EventSourcingRoot
     private ?FinancialTransaction $financialTransaction = null;
 
     /**
-     * @param Create $create
      * @throws Exception
      */
-    public function create(Create $create): void
+    public function create(): void
     {
-        $event = new AccountCreated($create->getDocument(), new Amount(0.0, new Currency('BRL')), new DateTimeImmutable());
+        $event = new AccountCreated($this->document, new Amount(0.0, new Currency('BRL')), new DateTimeImmutable());
 
         $this->when($event, $this->identity);
     }
@@ -143,5 +142,14 @@ final class Account implements EventSourcingRoot
     public function getFinancialTransaction(): FinancialTransaction
     {
         return $this->financialTransaction;
+    }
+
+    /**
+     * @return mixed
+     * @throws ReflectionException
+     */
+    protected function getIdentityValue(): mixed
+    {
+        return $this->getIdentity()->getValue();
     }
 }

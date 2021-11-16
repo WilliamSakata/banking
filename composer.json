@@ -16,7 +16,9 @@
     "doctrine/dbal": "^2.10",
     "php-di/php-di": "^6.0",
     "php-di/slim-bridge": "3.1.1",
-    "phpunit/phpunit": "9.5.9"
+    "phpunit/phpunit": "9.5.9",
+    "ramsey/uuid": "^4.2.3",
+    "ext-mbstring": "*"
   },
   "autoload": {
     "psr-4": {

@@ -2,12 +2,13 @@
 
 namespace Banking\Account\Model;
 
+use Banking\Account\Model\BuildingBlocks\Identity;
+use Banking\Account\Model\BuildingBlocks\IdentityCapabilities;
 use InvalidArgumentException;
 
 class Cpf implements Identity
 {
-    private string $value;
-
+    use IdentityCapabilities;
     /**
      * @param string $value
      */
@@ -54,13 +55,5 @@ class Cpf implements Identity
         }
 
         return true;
-    }
-
-    /**
-     * @return string
-     */
-    public function getValue(): string
-    {
-        return $this->value;
     }
 }

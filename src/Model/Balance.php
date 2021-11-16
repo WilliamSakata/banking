@@ -1,11 +1,18 @@
 <?php
 
-namespace Banking\Account\Model\ValueObject;
+namespace Banking\Account\Model;
 
+use Banking\Account\Model\BuildingBlocks\ValueObject\ValueObject;
+use Banking\Account\Model\BuildingBlocks\ValueObject\ValueObjectCapabilities;
 use LogicException;
 
 final class Balance implements ValueObject
 {
+    use ValueObjectCapabilities;
+
+    /**
+     * @param float $amount
+     */
     public function __construct(private float $amount)
     {
         if ($amount < 0) {
@@ -13,6 +20,9 @@ final class Balance implements ValueObject
         }
     }
 
+    /**
+     * @return float
+     */
     public function getAmount(): float
     {
         return $this->amount;

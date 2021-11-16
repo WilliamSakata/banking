@@ -10,7 +10,6 @@ use Doctrine\DBAL\Query\QueryBuilder;
 
 class MySqlAdapter
 {
-
     /**
      * @param Connection $connection
      */
