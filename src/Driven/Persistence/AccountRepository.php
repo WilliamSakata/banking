@@ -8,6 +8,7 @@ use Banking\Account\Model\BuildingBlocks\EventSourcing\EventRecord;
 use Banking\Account\Model\Cpf;
 use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Exception;
+use ReflectionException;
 
 class AccountRepository implements Repository
 {
@@ -23,6 +24,7 @@ class AccountRepository implements Repository
      * @return Account
      * @throws DriverException
      * @throws Exception
+     * @throws ReflectionException
      */
     public function pull(Cpf $cpf): Account
     {

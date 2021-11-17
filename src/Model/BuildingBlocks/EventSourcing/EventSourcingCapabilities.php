@@ -6,9 +6,11 @@ use Banking\Account\Model\BuildingBlocks\DomainEvent;
 use Banking\Account\Model\BuildingBlocks\EntityCapabilities;
 use Banking\Account\Model\BuildingBlocks\Identity;
 use Banking\Account\Model\BuildingBlocks\Version;
+use DateTimeImmutable;
 use Exception;
 use ReflectionClass;
 use Ramsey\Uuid\Uuid;
+use ReflectionException;
 
 trait EventSourcingCapabilities
 {
@@ -22,6 +24,7 @@ trait EventSourcingCapabilities
     /**
      * @param Identity $identity
      * @param Version $sequenceNumber
+     * @throws ReflectionException
      */
     private function __construct(private Identity $identity, private Version $sequenceNumber)
     {
@@ -39,6 +42,7 @@ trait EventSourcingCapabilities
     /**
      * @param Identity $identity
      * @return EventSourcingRoot
+     * @throws ReflectionException
      */
     public static function blank(Identity $identity): EventSourcingRoot
     {
@@ -49,6 +53,7 @@ trait EventSourcingCapabilities
      * @param Identity $identity
      * @param EventRecordCollection $records
      * @return EventSourcingRoot
+     * @throws ReflectionException
      */
     public static function reconstitute(Identity $identity, EventRecordCollection $records): EventSourcingRoot
     {
@@ -70,7 +75,16 @@ trait EventSourcingCapabilities
      */
     protected function when(DomainEvent $event, Identity $identity)
     {
-        $record = new EventRecord(Uuid::uuid4()->toString(), $event, $event->getRevision(), );
+        $record = new EventRecord(
+            Uuid::uuid4()->toString(),
+            $identity->getValue(),
+            $event,
+            $event->getRevision(),
+            $this->sequenceNumber->getValue(),
+            $event::class,
+            new DateTimeImmutable(),
+            $event->getAggregateType()
+        );
 
         $this->applyEvent($record);
         $this->recordEvent($record);

@@ -2,6 +2,7 @@
 
 namespace Banking\Account\Model\ValueObject;
 
+use Banking\Account\Model\Currency;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 

@@ -4,7 +4,7 @@ configure:
 	@${DOCKER_RUN} composer update --optimize-autoloader
 
 test:
-	@${DOCKER_RUN} composer test
+	@${DOCKER_RUN} composer test tests
 
 test-location:
 	@${DOCKER_RUN} composer test ${LOCATION}
