@@ -7,12 +7,4 @@ use Banking\Account\Model\BuildingBlocks\ValueObject\SingleValueObjectCapabiliti
 trait IdentityCapabilities
 {
     use SingleValueObjectCapabilities;
-
-    /**
-     * @return mixed
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
 }

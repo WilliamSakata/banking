@@ -2,12 +2,8 @@
 
 namespace Banking\Account\Model\BuildingBlocks;
 
-use Banking\Account\Model\BuildingBlocks\ValueObject\ValueObject;
+use Banking\Account\Model\BuildingBlocks\ValueObject\SingleValueObject;
 
-interface Identity extends ValueObject
+interface Identity extends SingleValueObject
 {
-    /**
-     * @return mixed
-     */
-    public function getValue(): mixed;
 }

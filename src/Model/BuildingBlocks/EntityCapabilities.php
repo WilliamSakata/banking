@@ -28,7 +28,7 @@ trait EntityCapabilities
      */
     public function getIdentityName(): string
     {
-        $result = $this->getIdentityValue();
+        $result = $this->getIdentityProperty();
 
         if ($result && (new Properties())->exists($this, $result)) {
             return $result;
@@ -47,5 +47,5 @@ trait EntityCapabilities
         return $this->getIdentity()->equals($entity->getIdentity());
     }
 
-    protected abstract function getIdentityValue();
+    protected abstract function getIdentityProperty();
 }

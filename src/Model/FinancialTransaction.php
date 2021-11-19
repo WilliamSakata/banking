@@ -7,26 +7,47 @@ use DateTimeImmutable;
 final class FinancialTransaction
 {
     /**
-     * @param DateTimeImmutable $date
-     * @param Amount $transactionValue
+     * @param DateTimeImmutable $createdAt
+     * @param Amount $amount
+     * @param string $type
      */
-    public function __construct(private DateTimeImmutable $date, private Amount $transactionValue)
+    public function __construct(private DateTimeImmutable $createdAt, private Amount $amount, private string $type)
     {
     }
 
     /**
      * @return DateTimeImmutable
      */
-    public function getDate(): DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
-        return $this->date;
+        return $this->createdAt;
     }
 
     /**
      * @return Amount
      */
-    public function getTransactionValue(): Amount
+    public function getAmount(): Amount
     {
-        return $this->transactionValue;
+        return $this->amount;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'amount' => [
+                'value' => $this->amount->getValue(),
+                'currency' => $this->amount->getCurrency()->getValue()
+            ],
+            'type' => $this->type,
+            'createdAt' => $this->createdAt->format('Y-m-d H:i:s')
+        ];
     }
 }

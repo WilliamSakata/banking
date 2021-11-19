@@ -55,9 +55,20 @@ class AccountRepository implements Repository
 
                 $builder->insert('account_events')
                     ->setValue('code', ':code')
+                    ->setValue('aggregate_type', ':aggregateType')
+                    ->setValue('aggregate_id', ':aggregateId')
+                    ->setValue('event_name', ':eventName')
+                    ->setValue('sequence_number', ':sequenceNumber')
+                    ->setValue('revision', ':revision')
                     ->setValue('payload', ':payload')
-                    ->setValue('occurredOn', ':occurredOn')
-                    ->setParameter(':code', $recordedEvent->getIdentity())
+                    ->setValue('occurred_on', ':occurredOn')
+                    ->setParameter(':code', $recordedEvent->getId())
+                    ->setParameter(':aggregateType', $recordedEvent->getAggregateType())
+                    ->setParameter(':aggregateId', $recordedEvent->getIdentity())
+                    ->setParameter(':eventName', $recordedEvent->getEventName())
+                    ->setParameter(':sequenceNumber', $recordedEvent->getSequenceNumber())
+                    ->setParameter(':revision', $recordedEvent->getRevision())
+
                     ->setParameter(':amount', $recordedEvent->getDomainEvent());
             }
             $this->adapter->beginTransaction();
@@ -79,8 +90,8 @@ class AccountRepository implements Repository
                 ->setValue('amount', ':amount')
                 ->setValue('occurredOn', ':occurredOn')
                 ->setParameter(':accountId', $account->getDocument()->getValue())
-                ->setParameter(':amount', $account->getFinancialTransaction()->getTransactionValue()->getValue())
-                ->setParameter(':occurredOn', $account->getFinancialTransaction()->getDate()->format('Y-m-d h:m:s'))
+                ->setParameter(':amount', $account->getFinancialTransaction()->getAmount()->getValue())
+                ->setParameter(':occurredOn', $account->getFinancialTransaction()->getCreatedAt()->format('Y-m-d h:m:s'))
                 ->execute();
 
             $this->adapter->commit();

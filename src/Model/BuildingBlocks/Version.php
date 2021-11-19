@@ -29,6 +29,6 @@ class Version implements SingleValueObject
      */
     public function next(): Version
     {
-        return static($this->value + 1);
+        return new static($this->value + 1);
     }
 }

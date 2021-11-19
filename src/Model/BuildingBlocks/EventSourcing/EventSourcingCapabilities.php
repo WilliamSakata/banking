@@ -3,19 +3,16 @@
 namespace Banking\Account\Model\BuildingBlocks\EventSourcing;
 
 use Banking\Account\Model\BuildingBlocks\DomainEvent;
-use Banking\Account\Model\BuildingBlocks\EntityCapabilities;
 use Banking\Account\Model\BuildingBlocks\Identity;
 use Banking\Account\Model\BuildingBlocks\Version;
 use DateTimeImmutable;
 use Exception;
-use ReflectionClass;
 use Ramsey\Uuid\Uuid;
+use ReflectionClass;
 use ReflectionException;
 
 trait EventSourcingCapabilities
 {
-    use EntityCapabilities;
-
     /**
      * @var EventRecordCollection
      */
@@ -29,6 +26,7 @@ trait EventSourcingCapabilities
     private function __construct(private Identity $identity, private Version $sequenceNumber)
     {
         $this->{$this->getIdentityName()} = $this->identity;
+        $this->recordedEvents = new EventRecordCollection();
     }
 
     /**
@@ -95,7 +93,7 @@ trait EventSourcingCapabilities
      */
     private function recordEvent(EventRecord $record)
     {
-        $this->recordedEvents[] = $record;
+        $this->recordedEvents->add($record);
     }
 
     /**

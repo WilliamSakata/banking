@@ -4,46 +4,40 @@ namespace Banking\Account\Model;
 
 use Banking\Account\Command\Deposit\Deposit;
 use Banking\Account\Command\Withdraw\Withdraw;
+use Banking\Account\Model\BuildingBlocks\EntityCapabilities;
 use Banking\Account\Model\BuildingBlocks\EventSourcing\EventSourcingCapabilities;
 use Banking\Account\Model\BuildingBlocks\EventSourcing\EventSourcingRoot;
 use Banking\Account\Model\BuildingBlocks\Identity;
 use DateTimeImmutable;
 use DomainException;
 use Exception;
-use ReflectionException;
 
 final class Account implements EventSourcingRoot
 {
     use EventSourcingCapabilities;
+    use EntityCapabilities;
 
     private const DEPOSIT_LIMIT = 10000;
+    private const IDENTITY = 'document';
 
     /**
-     * @var Cpf|null
+     * @var Cpf
      */
-    private ?Cpf $document = null;
+    private Cpf $document;
 
     /**
-     * @var Balance|null
+     * @var Balance
      */
-    private ?Balance $balance = null;
+    private Balance $balance;
 
-    /**
-     * @var DateTimeImmutable|null
-     */
-    private ?DateTimeImmutable $updatedAt = null;
-
-    /**
-     * @var FinancialTransaction|null
-     */
-    private ?FinancialTransaction $financialTransaction = null;
+    //@ToDo Colocar uma coleção de financial transaction e a cada evento adicionar na lista
 
     /**
      * @throws Exception
      */
     public function create(): void
     {
-        $event = new AccountCreated($this->document, new Amount(0.0, new Currency('BRL')), new DateTimeImmutable());
+        $event = new AccountCreated($this->document, new Amount(100, new Currency('BRL')), new DateTimeImmutable());
 
         $this->when($event, $this->identity);
     }
@@ -56,7 +50,6 @@ final class Account implements EventSourcingRoot
     {
         $this->document = $accountCreated->getAccountId();
         $this->balance = new Balance($accountCreated->getAmount()->getValue());
-        $this->updatedAt = $accountCreated->getOccurredOn();
     }
 
     /**
@@ -66,15 +59,14 @@ final class Account implements EventSourcingRoot
     public function withDraw(Withdraw $withdraw): void
     {
         if ($this->withoutBalance($withdraw->getAmount())) {
-            throw new DomainException('Saldo insuficiente');
+            throw new DomainException('Insufficient balance');
         }
 
-        $amount = new Amount($withdraw->getAmount()->getValue() * -1, $withdraw->getAmount()->getCurrency());
-        $this->financialTransaction = new FinancialTransaction(new DateTimeImmutable(), $amount);
+        $amount = new Amount($withdraw->getAmount()->getValue(), $withdraw->getAmount()->getCurrency());
 
-        $balance = new Balance($this->balance->getAmount() - $withdraw->getAmount()->getValue());
+        $financialTransaction = new FinancialTransaction(new DateTimeImmutable(), $amount, FinancialTransactionType::DEBIT);
 
-        $event = new WithdrawPerformed($withdraw->getDocument(), new Amount($balance->getAmount(), $withdraw->getAmount()->getCurrency()), new DateTimeImmutable());
+        $event = new WithdrawPerformed($withdraw->getDocument(), $financialTransaction);
         $this->when($event, $this->identity);
     }
 
@@ -85,8 +77,8 @@ final class Account implements EventSourcingRoot
     public function onWithdrawPerformed(WithdrawPerformed $withdrawPerformed): void
     {
         $this->document = $withdrawPerformed->getAccountId();
-        $this->balance = new Balance($withdrawPerformed->getAmount()->getValue());
-        $this->updatedAt = $withdrawPerformed->getOccurredOn();
+        $newBalance = $this->balance->getAmount() - $withdrawPerformed->getFinancialTransaction()->getAmount()->getValue();
+        $this->balance = new Balance($newBalance);
     }
 
     /**
@@ -137,19 +129,10 @@ final class Account implements EventSourcingRoot
     }
 
     /**
-     * @return FinancialTransaction
+     * @return string
      */
-    public function getFinancialTransaction(): FinancialTransaction
+    protected function getIdentityProperty(): string
     {
-        return $this->financialTransaction;
-    }
-
-    /**
-     * @return mixed
-     * @throws ReflectionException
-     */
-    protected function getIdentityValue(): mixed
-    {
-        return $this->getIdentity()->getValue();
+        return self::IDENTITY;
     }
 }

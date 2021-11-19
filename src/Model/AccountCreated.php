@@ -47,13 +47,31 @@ class AccountCreated implements DomainEvent
         return $this->occurredOn;
     }
 
+    /**
+     * @return int
+     */
     public function getRevision(): int
     {
         return 1;
     }
 
+    /**
+     * @return string
+     */
     public function getAggregateType(): string
     {
         return AccountCreated::class;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+          'accountId' => $this->accountId,
+          'amount' => $this->amount,
+          'occurredOn' => $this->occurredOn
+        ];
     }
 }

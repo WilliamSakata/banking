@@ -3,24 +3,18 @@
 namespace Banking\Account\Model;
 
 use Banking\Account\Model\BuildingBlocks\DomainEvent;
-use DateTimeImmutable;
 
 final class WithdrawPerformed implements DomainEvent
 {
-    private Cpf $accountId;
-    private Amount $amount;
-    private DateTimeImmutable $occurredOn;
+    private const REVISION = 1;
+    private const AGGREGATE_TYPE = 'Account';
 
     /**
      * @param Cpf $accountId
-     * @param Amount $amount
-     * @param DateTimeImmutable $occurredOn
+     * @param FinancialTransaction $financialTransaction
      */
-    public function __construct(Cpf $accountId, Amount $amount, DateTimeImmutable $occurredOn)
+    public function __construct(private Cpf $accountId, private FinancialTransaction $financialTransaction)
     {
-        $this->accountId = $accountId;
-        $this->amount = $amount;
-        $this->occurredOn = $occurredOn;
     }
 
     /**
@@ -32,19 +26,11 @@ final class WithdrawPerformed implements DomainEvent
     }
 
     /**
-     * @return Amount
+     * @return FinancialTransaction
      */
-    public function getAmount(): Amount
+    public function getFinancialTransaction(): FinancialTransaction
     {
-        return $this->amount;
-    }
-
-    /**
-     * @return DateTimeImmutable
-     */
-    public function getOccurredOn(): DateTimeImmutable
-    {
-        return $this->occurredOn;
+        return $this->financialTransaction;
     }
 
     /**
@@ -52,7 +38,7 @@ final class WithdrawPerformed implements DomainEvent
      */
     public function getRevision(): int
     {
-        return 1;
+        return self::REVISION;
     }
 
     /**
@@ -60,6 +46,17 @@ final class WithdrawPerformed implements DomainEvent
      */
     public function getAggregateType(): string
     {
-        return 'Account';
+        return self::AGGREGATE_TYPE;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+            'accountId' => $this->accountId,
+            'financialTransaction' => $this->financialTransaction->toArray()
+        ];
     }
 }
