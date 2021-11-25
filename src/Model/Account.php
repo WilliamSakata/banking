@@ -96,6 +96,7 @@ final class Account implements EventSourcingRoot
 
     /**
      * @param Deposit $deposit
+     * @throws Exception
      */
     public function deposit(Deposit $deposit): void
     {
@@ -103,8 +104,24 @@ final class Account implements EventSourcingRoot
             throw new DomainException('Limite por depósito atingido. Valor máximo permitido é de R$10.000,00');
         }
 
-        //$this->financialTransaction = new FinancialTransaction(new DateTimeImmutable(), $deposit->getAmount());
-        $this->balance = new Balance($this->balance->getAmount() + $deposit->getAmount()->getValue());
+        $amount = new Amount($deposit->getAmount()->getValue(), $deposit->getAmount()->getCurrency());
+
+        $financialTransaction = new FinancialTransaction(new DateTimeImmutable(), $amount, FinancialTransactionType::DEBIT);
+
+        $event = new DepositPerformed($deposit->getDocument(), $financialTransaction);
+
+        $this->when($event, $this->identity);
+    }
+
+    /**
+     * @param DepositPerformed $depositPerformed
+     * @noinspection PhpUnused
+     */
+    public function onDepositPerformed(DepositPerformed $depositPerformed): void
+    {
+        $this->document = $depositPerformed->getAccountId();
+        $newBalance = $this->balance->getAmount() + $depositPerformed->getFinancialTransaction()->getAmount()->getValue();
+        $this->balance = new Balance($newBalance);
     }
 
     public function getIdentity(): Identity

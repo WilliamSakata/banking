@@ -3,6 +3,7 @@
 namespace Banking\Account\Command\Deposit;
 
 use Banking\Account\Model\AccountRepository;
+use Exception;
 
 class DepositHandler
 {
@@ -15,6 +16,7 @@ class DepositHandler
 
     /**
      * @param Deposit $deposit
+     * @throws Exception
      */
     public function __invoke(Deposit $deposit)
     {
