@@ -20,5 +20,7 @@ final class Currency implements SingleValueObject
         if (strlen($value) !== self::SIZE) {
             throw new LogicException(sprintf('Invalid currency %s', $value));
         }
+
+        $this->value = strtoupper($value);
     }
 }
