@@ -4,6 +4,7 @@ namespace Banking\Account\Model;
 
 use Banking\Account\Command\Deposit\Deposit;
 use Banking\Account\Command\Withdraw\Withdraw;
+use Banking\Account\Model\BuildingBlocks\Version;
 use DomainException;
 use PHPUnit\Framework\TestCase;
 
@@ -41,6 +42,7 @@ class AccountTest extends TestCase
 
         static::assertEquals('353.934.420-92', $account->getDocument()->getValue());
         static::assertEquals(90, $account->getBalance()->getAmount());
+        static::assertEquals(new Version(3), $account->getSequenceNumber());
 
         static::assertInstanceOf(
             AccountCreated::class, $account->getRecordedEvents()->getList()[0]->getDomainEvent()
@@ -115,5 +117,23 @@ class AccountTest extends TestCase
 
         $withDraw = new Withdraw(new Cpf(self::DOCUMENT), new Amount( 10, new Currency('BRL')));
         $account->withDraw($withDraw);
+    }
+
+    public function test(): void
+    {
+        /** @var Account $account */
+        $account = Account::blank(new Cpf(self::DOCUMENT));
+        $account->create();
+
+        $deposit = new Deposit($this->cpf, new Amount(100, $this->currency));
+        $account->deposit($deposit);
+
+        $withDraw = new Withdraw(new Cpf(self::DOCUMENT), new Amount( 10, new Currency('BRL')));
+        $account->withDraw($withDraw);
+
+        static::assertEquals(new Amount(100, $this->currency), $account->getFinancialTransactionCollection()->getList()[0]->getAmount());
+        static::assertEquals('C', $account->getFinancialTransactionCollection()->getList()[0]->getType());
+        static::assertEquals(new Amount(10, $this->currency), $account->getFinancialTransactionCollection()->getList()[1]->getAmount());
+        static::assertEquals('D', $account->getFinancialTransactionCollection()->getList()[1]->getType());
     }
 }

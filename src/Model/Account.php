@@ -6,6 +6,7 @@ use Banking\Account\Command\Deposit\Deposit;
 use Banking\Account\Command\Withdraw\Withdraw;
 use Banking\Account\Model\BuildingBlocks\EventSourcing\EventSourcingCapabilities;
 use Banking\Account\Model\BuildingBlocks\EventSourcing\EventSourcingRoot;
+use Banking\Account\Model\BuildingBlocks\Version;
 use DateTimeImmutable;
 use DomainException;
 use Exception;
@@ -149,6 +150,14 @@ final class Account implements EventSourcingRoot
     public function getFinancialTransactionCollection(): FinancialTransactionCollection
     {
         return $this->financialTransactionCollection;
+    }
+
+    /**
+     * @return Version
+     */
+    public function getSequenceNumber(): Version
+    {
+        return $this->sequenceNumber;
     }
 
     /**
