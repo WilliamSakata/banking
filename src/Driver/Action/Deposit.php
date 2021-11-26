@@ -7,6 +7,7 @@ use Banking\Account\Command\Deposit\DepositHandler;
 use Banking\Account\Model\Amount;
 use Banking\Account\Model\Currency;
 use Banking\Account\Model\Cpf;
+use Exception;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
@@ -25,6 +26,7 @@ class Deposit
      * @param Request $request
      * @param Response $response
      * @return Response
+     * @throws Exception
      */
     public function __invoke(Request $request, Response $response): Response
     {

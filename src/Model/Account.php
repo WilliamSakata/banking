@@ -4,10 +4,8 @@ namespace Banking\Account\Model;
 
 use Banking\Account\Command\Deposit\Deposit;
 use Banking\Account\Command\Withdraw\Withdraw;
-use Banking\Account\Model\BuildingBlocks\EntityCapabilities;
 use Banking\Account\Model\BuildingBlocks\EventSourcing\EventSourcingCapabilities;
 use Banking\Account\Model\BuildingBlocks\EventSourcing\EventSourcingRoot;
-use Banking\Account\Model\BuildingBlocks\Identity;
 use DateTimeImmutable;
 use DomainException;
 use Exception;
@@ -15,7 +13,6 @@ use Exception;
 final class Account implements EventSourcingRoot
 {
     use EventSourcingCapabilities;
-    use EntityCapabilities;
 
     private const DEPOSIT_LIMIT = 10000;
     private const IDENTITY = 'document';
@@ -30,16 +27,19 @@ final class Account implements EventSourcingRoot
      */
     private Balance $balance;
 
-    //@ToDo Colocar uma coleção de financial transaction e a cada evento adicionar na lista
+    /**
+     * @var FinancialTransactionCollection
+     */
+    private FinancialTransactionCollection $financialTransactionCollection;
 
     /**
      * @throws Exception
      */
     public function create(): void
     {
-        $event = new AccountCreated($this->document, new Amount(100, new Currency('BRL')), new DateTimeImmutable());
+        $event = new AccountCreated($this->document, new Amount(0, new Currency('BRL')), new DateTimeImmutable());
 
-        $this->when($event, $this->identity);
+        $this->trigger($event);
     }
 
     /**
@@ -50,6 +50,7 @@ final class Account implements EventSourcingRoot
     {
         $this->document = $accountCreated->getAccountId();
         $this->balance = new Balance($accountCreated->getAmount()->getValue());
+        $this->financialTransactionCollection = new FinancialTransactionCollection();
     }
 
     /**
@@ -67,7 +68,7 @@ final class Account implements EventSourcingRoot
         $financialTransaction = new FinancialTransaction(new DateTimeImmutable(), $amount, FinancialTransactionType::DEBIT);
 
         $event = new WithdrawPerformed($withdraw->getDocument(), $financialTransaction);
-        $this->when($event, $this->identity);
+        $this->trigger($event);
     }
 
     /**
@@ -79,6 +80,7 @@ final class Account implements EventSourcingRoot
         $this->document = $withdrawPerformed->getAccountId();
         $newBalance = $this->balance->getAmount() - $withdrawPerformed->getFinancialTransaction()->getAmount()->getValue();
         $this->balance = new Balance($newBalance);
+        $this->financialTransactionCollection->add($withdrawPerformed->getFinancialTransaction());
     }
 
     /**
@@ -101,16 +103,16 @@ final class Account implements EventSourcingRoot
     public function deposit(Deposit $deposit): void
     {
         if ($deposit->getAmount()->getValue() > self::DEPOSIT_LIMIT) {
-            throw new DomainException('Limite por depósito atingido. Valor máximo permitido é de R$10.000,00');
+            throw new DomainException('Deposit limit reached. The max value allowed is 10000');
         }
 
         $amount = new Amount($deposit->getAmount()->getValue(), $deposit->getAmount()->getCurrency());
 
-        $financialTransaction = new FinancialTransaction(new DateTimeImmutable(), $amount, FinancialTransactionType::DEBIT);
+        $financialTransaction = new FinancialTransaction(new DateTimeImmutable(), $amount, FinancialTransactionType::CREDIT);
 
         $event = new DepositPerformed($deposit->getDocument(), $financialTransaction);
 
-        $this->when($event, $this->identity);
+        $this->trigger($event);
     }
 
     /**
@@ -122,11 +124,7 @@ final class Account implements EventSourcingRoot
         $this->document = $depositPerformed->getAccountId();
         $newBalance = $this->balance->getAmount() + $depositPerformed->getFinancialTransaction()->getAmount()->getValue();
         $this->balance = new Balance($newBalance);
-    }
-
-    public function getIdentity(): Identity
-    {
-        return $this->identity;
+        $this->financialTransactionCollection->add($depositPerformed->getFinancialTransaction());
     }
 
     /**
@@ -143,6 +141,14 @@ final class Account implements EventSourcingRoot
     public function getBalance(): Balance
     {
         return $this->balance;
+    }
+
+    /**
+     * @return FinancialTransactionCollection
+     */
+    public function getFinancialTransactionCollection(): FinancialTransactionCollection
+    {
+        return $this->financialTransactionCollection;
     }
 
     /**
