@@ -47,5 +47,5 @@ trait EntityCapabilities
         return $this->getIdentity()->equals($entity->getIdentity());
     }
 
-    protected abstract function getIdentityProperty();
+    public abstract function getIdentityProperty();
 }

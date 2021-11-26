@@ -3,6 +3,7 @@
 namespace Banking\Account\Model\BuildingBlocks\EventSourcing;
 
 use Banking\Account\Model\BuildingBlocks\DomainEvent;
+use Banking\Account\Model\BuildingBlocks\EntityCapabilities;
 use Banking\Account\Model\BuildingBlocks\Identity;
 use Banking\Account\Model\BuildingBlocks\Version;
 use DateTimeImmutable;
@@ -13,6 +14,8 @@ use ReflectionException;
 
 trait EventSourcingCapabilities
 {
+    use EntityCapabilities;
+
     /**
      * @var EventRecordCollection
      */
@@ -66,16 +69,16 @@ trait EventSourcingCapabilities
     }
 
     /**
-     * Aplica e salva evento na instância do agregado
      * @param  DomainEvent $event
-     * @param  Identity $identity
      * @throws Exception
      */
-    protected function when(DomainEvent $event, Identity $identity)
+    protected function trigger(DomainEvent $event)
     {
+        $this->sequenceNumber = $this->sequenceNumber->next();
+
         $record = new EventRecord(
             Uuid::uuid4()->toString(),
-            $identity->getValue(),
+            $this->getIdentity(),
             $event,
             $event->getRevision(),
             $this->sequenceNumber->getValue(),
@@ -97,13 +100,11 @@ trait EventSourcingCapabilities
     }
 
     /**
-     * Aplica evento na instância do agregado
-     *
      * @param EventRecord $record
      */
     private function applyEvent(EventRecord $record)
     {
-        $method = $this->onEventName($record->getDomainEvent());
+        $method = $this->onEvent($record->getDomainEvent());
         $this->$method($record->getDomainEvent());
     }
 
@@ -111,7 +112,7 @@ trait EventSourcingCapabilities
      * @param DomainEvent $event
      * @return string
      */
-    private function onEventName(DomainEvent $event): string
+    private function onEvent(DomainEvent $event): string
     {
         return sprintf("on%s", (new ReflectionClass($event))->getShortName());
     }
