@@ -60,8 +60,7 @@ trait EventSourcingCapabilities
     {
         $aggregate = static::blank($identity);
 
-        /** @var EventRecord[] $records */
-        foreach ($records as $record) {
+        foreach ($records->getList() as $record) {
             $aggregate->applyEvent($record);
         }
 
@@ -82,7 +81,7 @@ trait EventSourcingCapabilities
             $event,
             $event->getRevision(),
             $this->sequenceNumber->getValue(),
-            $event::class,
+            (new \ReflectionClass($event::class))->getShortName(),
             new DateTimeImmutable(),
             $event->getAggregateType()
         );

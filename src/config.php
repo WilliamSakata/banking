@@ -1,6 +1,5 @@
 <?php
 
-use Banking\Account\Driven\Database\MySqlAdapter as QueryAdapter;
 use Banking\Account\Driven\Persistence\AccountRepository as AccountRepositoryAdapter;
 use Banking\Account\Driven\Persistence\MySqlAdapter;
 use Banking\Account\Model\AccountRepository;
@@ -18,9 +17,6 @@ return [
     },
     MySqlAdapter::class => function (ContainerInterface $container) {
         return new MySqlAdapter($container->get(Connection::class));
-    },
-    QueryAdapter::class => function (ContainerInterface $container) {
-        return new QueryAdapter($container->get(Connection::class));
     },
     AccountRepository::class => function (ContainerInterface $container) {
         return new AccountRepositoryAdapter($container->get(MySqlAdapter::class));

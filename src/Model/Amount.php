@@ -73,4 +73,12 @@ final class Amount implements ValueObject
     {
         return $this->currency;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'value' => $this->getValue(),
+            'currency' => $this->getCurrency()->getValue()
+        ];
+    }
 }

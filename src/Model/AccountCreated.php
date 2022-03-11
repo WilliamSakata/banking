@@ -7,6 +7,9 @@ use DateTimeImmutable;
 
 class AccountCreated implements DomainEvent
 {
+    private const AGGREGATE_TYPE = 'AccountCreated';
+    private const REVISION = 1;
+
     private Cpf $accountId;
     private Amount $amount;
     private DateTimeImmutable $occurredOn;
@@ -52,7 +55,7 @@ class AccountCreated implements DomainEvent
      */
     public function getRevision(): int
     {
-        return 1;
+        return self::REVISION;
     }
 
     /**
@@ -60,7 +63,7 @@ class AccountCreated implements DomainEvent
      */
     public function getAggregateType(): string
     {
-        return AccountCreated::class;
+        return self::AGGREGATE_TYPE;
     }
 
     /**
@@ -69,9 +72,9 @@ class AccountCreated implements DomainEvent
     public function toArray(): array
     {
         return [
-          'accountId' => $this->accountId,
-          'amount' => $this->amount,
-          'occurredOn' => $this->occurredOn
+          'accountId' => $this->accountId->toArray(),
+          'amount' => $this->amount->toArray(),
+          'occurredOn' => $this->occurredOn->format('Y-m-d H:i:s')
         ];
     }
 }

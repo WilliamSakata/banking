@@ -5,16 +5,18 @@ namespace Banking\Account\Model;
 use Banking\Account\Model\BuildingBlocks\Identity;
 use Banking\Account\Model\BuildingBlocks\IdentityCapabilities;
 use InvalidArgumentException;
+use PhpParser\Node\Expr\Array_;
 
 class Cpf implements Identity
 {
     use IdentityCapabilities;
+
     /**
      * @param string $value
      */
     public function __construct(string $value)
     {
-        if(!$this->isValid($value)){
+        if (!$this->isValid($value)) {
             throw new InvalidArgumentException('CPF inválido');
         }
 
@@ -31,7 +33,7 @@ class Cpf implements Identity
 
         $cpf = preg_replace('/[^0-9]/is', '', $value);
 
-        if(strlen($cpf) != 11){
+        if (strlen($cpf) != 11) {
             return false;
         }
 
@@ -49,11 +51,18 @@ class Cpf implements Identity
 
             $result = (($sum * 10) % 11);
 
-            if($cpf[$item] != $result){
+            if ($cpf[$item] != $result) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'cpf' => $this->getValue()
+        ];
     }
 }

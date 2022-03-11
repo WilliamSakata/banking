@@ -3,12 +3,22 @@
 namespace Banking\Account\Driven\Persistence;
 
 use Banking\Account\Model\Account;
+use Banking\Account\Model\AccountCreated;
 use Banking\Account\Model\AccountRepository as Repository;
+use Banking\Account\Model\Amount;
+use Banking\Account\Model\BuildingBlocks\DomainEvent;
 use Banking\Account\Model\BuildingBlocks\EventSourcing\EventRecord;
+use Banking\Account\Model\BuildingBlocks\EventSourcing\EventRecordCollection;
 use Banking\Account\Model\Cpf;
+use Banking\Account\Model\Currency;
+use Banking\Account\Model\DepositPerformed;
+use Banking\Account\Model\FinancialTransaction;
+use Banking\Account\Model\WithdrawPerformed;
+use DateTimeImmutable;
 use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Exception;
 use ReflectionException;
+use function DI\add;
 
 class AccountRepository implements Repository
 {
@@ -25,19 +35,98 @@ class AccountRepository implements Repository
      * @throws DriverException
      * @throws Exception
      * @throws ReflectionException
+     * @throws \Exception
      */
     public function pull(Cpf $cpf): Account
     {
         $builder = $this->adapter->createQueryBuilder();
 
         $statement = $builder->select('*')
-            ->from('accounts')
-            ->where('accountId = :accountId')
-            ->setParameter(':accountId', $cpf->getValue())
+            ->from('account_events')
+            ->where('aggregate_id = :aggregateId')
+            ->orderBy('sequence_number')
+            ->setParameter(':aggregateId', $cpf->getValue())
             ->execute();
 
-        $result = $statement->fetchAssociative();
-        return Account::reconstitute($cpf, $result);
+        $result = $statement->fetchAllAssociative();
+
+        $collection = new EventRecordCollection();
+
+        foreach ($result as $item) {
+            $collection->add($this->buildEventRecord($item));
+        }
+
+        return Account::reconstitute($cpf, $collection);
+    }
+
+    /**
+     * @param array $item
+     * @return EventRecord
+     * @throws \Exception
+     */
+    private function buildEventRecord(array $item): EventRecord
+    {
+        $id = $item["code"];
+        $identity = $item["aggregate_id"];
+        $domainEvent = $this->identifyDomainEvent($item["event_name"], $item["payload"]);
+        $revision = $item["revision"];
+        $sequenceNumber = $item["sequence_number"];
+        $eventName = $item["event_name"];
+        $occurredOn = new DateTimeImmutable($item["occurred_on"]);
+        $aggregateType = $item["aggregate_type"];
+
+        return new EventRecord(
+            $id,
+            $identity,
+            $domainEvent,
+            $revision,
+            $sequenceNumber,
+            $eventName,
+            $occurredOn,
+            $aggregateType
+        );
+    }
+
+    /**
+     * @param String $domainName
+     * @param String $payload
+     * @return DomainEvent
+     * @throws \Exception
+     */
+    private function identifyDomainEvent(string $domainName, string $payload): DomainEvent
+    {
+        $eventObj = json_decode($payload);
+
+        return match ($domainName) {
+            "AccountCreated" => new AccountCreated(
+                new Cpf($eventObj->accountId->cpf),
+                new Amount($eventObj->amount->value, new Currency($eventObj->amount->currency)),
+                new DateTimeImmutable($eventObj->occurredOn)
+            ),
+            "WithdrawPerformed" => new WithdrawPerformed(
+                new Cpf($eventObj->accountId->cpf),
+                new FinancialTransaction(
+                    new DateTimeImmutable($eventObj->financialTransaction->createdAt),
+                    new Amount(
+                        $eventObj->financialTransaction->amount->value,
+                        new Currency($eventObj->financialTransaction->amount->currency)
+                    ),
+                    $eventObj->financialTransaction->type
+                )
+            ),
+            "DepositPerformed" => new DepositPerformed(
+                new Cpf($eventObj->accountId->cpf),
+                new FinancialTransaction(
+                    new DateTimeImmutable($eventObj->financialTransaction->createdAt),
+                    new Amount(
+                        $eventObj->financialTransaction->amount->value,
+                        new Currency($eventObj->financialTransaction->amount->currency)
+                    ),
+                    $eventObj->financialTransaction->type
+                )
+            ),
+            default => throw new \DomainException("Event not supported"),
+        };
     }
 
     /**
@@ -47,9 +136,10 @@ class AccountRepository implements Repository
     public function push(Account $account): void
     {
         try {
+            $this->adapter->beginTransaction();
+
             /** @var EventRecord $recordedEvent */
-            foreach ($account->getRecordedEvents() as $recordedEvent) {
-                $this->adapter->beginTransaction();
+            foreach ($account->getRecordedEvents()->getList() as $recordedEvent) {
 
                 $builder = $this->adapter->createQueryBuilder();
 
@@ -68,31 +158,10 @@ class AccountRepository implements Repository
                     ->setParameter(':eventName', $recordedEvent->getEventName())
                     ->setParameter(':sequenceNumber', $recordedEvent->getSequenceNumber())
                     ->setParameter(':revision', $recordedEvent->getRevision())
-
-                    ->setParameter(':amount', $recordedEvent->getDomainEvent());
+                    ->setParameter(':payload', json_encode($recordedEvent->getDomainEvent()->toArray()))
+                    ->setParameter(':occurredOn', $recordedEvent->getOccurredOn()->format('Y-m-d H:i:s'))
+                    ->execute();
             }
-            $this->adapter->beginTransaction();
-
-            $builder = $this->adapter->createQueryBuilder();
-
-            $builder->update('accounts')
-                ->set('accountId', ':accountId')
-                ->set('balance', ':amount')
-                ->where('accountId = :accountId')
-                ->setParameter(':accountId', $account->getDocument()->getValue())
-                ->setParameter(':amount', $account->getBalance()->getValue())
-                ->execute();
-
-            $qb = $this->adapter->createQueryBuilder();
-
-            $qb->insert('financialTransactions')
-                ->setValue('accountId', ':accountId')
-                ->setValue('amount', ':amount')
-                ->setValue('occurredOn', ':occurredOn')
-                ->setParameter(':accountId', $account->getDocument()->getValue())
-                ->setParameter(':amount', $account->getFinancialTransaction()->getAmount()->getValue())
-                ->setParameter(':occurredOn', $account->getFinancialTransaction()->getCreatedAt()->format('Y-m-d h:m:s'))
-                ->execute();
 
             $this->adapter->commit();
         } catch (Exception $ex) {

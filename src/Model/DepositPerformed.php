@@ -7,7 +7,7 @@ use Banking\Account\Model\BuildingBlocks\DomainEvent;
 class DepositPerformed implements DomainEvent
 {
     private const REVISION = 1;
-    private const AGGREGATE_TYPE = 'Account';
+    private const AGGREGATE_TYPE = 'AccountCredited';
 
     public function __construct(private Cpf $accountId, private FinancialTransaction $financialTransaction)
     {
@@ -42,7 +42,7 @@ class DepositPerformed implements DomainEvent
     public function toArray(): array
     {
         return [
-            'accountId' => $this->accountId,
+            'accountId' => $this->accountId->toArray(),
             'financialTransaction' => $this->financialTransaction->toArray()
         ];
     }

@@ -35,6 +35,18 @@ services:
       - "traefik.tcp.routers.mysql.entrypoints=mysql"
       - "traefik.tcp.services.mysql.loadbalancer.server.port=3306"
 
+  flyway:
+    container_name: 'flyway'
+    image: flyway/flyway
+    command: migrate
+    links:
+      - "mysql:database.localhost"
+    volumes:
+      - "./sql:/flyway/sql"
+      - "./config/flyway.conf:/flyway/conf/flyway.conf"
+    depends_on:
+      - mysql
+
   bank-account:
     container_name: bank-account
     build:
@@ -47,13 +59,14 @@ services:
       - "mysql:database.localhost"
     volumes:
       - ./:/app
+      - ./config/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
   account-nginx:
     image: nginx:latest
     container_name: account-nginx
     restart: always
     volumes:
-      - ./config:/etc/nginx/conf.d
+      - ./config/nginx.conf:/etc/nginx/conf.d/nginx.conf
     depends_on:
       - bank-account
     labels:

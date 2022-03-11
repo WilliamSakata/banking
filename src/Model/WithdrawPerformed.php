@@ -7,7 +7,7 @@ use Banking\Account\Model\BuildingBlocks\DomainEvent;
 final class WithdrawPerformed implements DomainEvent
 {
     private const REVISION = 1;
-    private const AGGREGATE_TYPE = 'Account';
+    private const AGGREGATE_TYPE = 'AccountDebited';
 
     /**
      * @param Cpf $accountId
@@ -55,7 +55,7 @@ final class WithdrawPerformed implements DomainEvent
     public function toArray(): array
     {
         return [
-            'accountId' => $this->accountId,
+            'accountId' => $this->accountId->toArray(),
             'financialTransaction' => $this->financialTransaction->toArray()
         ];
     }
