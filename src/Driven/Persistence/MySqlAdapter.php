@@ -21,18 +21,6 @@ class MySqlAdapter
      * @param string $sql
      * @param array $params
      * @param array $types
-     * @return ResultStatement
-     * @throws Exception
-     */
-    public function executeQuery(string $sql, array $params = [], array $types = []): ResultStatement
-    {
-        return $this->connection->executeQuery($sql, $params, $types);
-    }
-
-    /**
-     * @param string $sql
-     * @param array $params
-     * @param array $types
      * @return int
      * @throws Exception
      */

@@ -3,22 +3,13 @@
 namespace Banking\Account\Driven\Persistence;
 
 use Banking\Account\Model\Account;
-use Banking\Account\Model\AccountCreated;
 use Banking\Account\Model\AccountRepository as Repository;
-use Banking\Account\Model\Amount;
-use Banking\Account\Model\BuildingBlocks\DomainEvent;
 use Banking\Account\Model\BuildingBlocks\EventSourcing\EventRecord;
 use Banking\Account\Model\BuildingBlocks\EventSourcing\EventRecordCollection;
 use Banking\Account\Model\Cpf;
-use Banking\Account\Model\Currency;
-use Banking\Account\Model\DepositPerformed;
-use Banking\Account\Model\FinancialTransaction;
-use Banking\Account\Model\WithdrawPerformed;
-use DateTimeImmutable;
 use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Exception;
 use ReflectionException;
-use function DI\add;
 
 class AccountRepository implements Repository
 {
@@ -27,6 +18,31 @@ class AccountRepository implements Repository
      */
     public function __construct(private MySqlAdapter $adapter)
     {
+    }
+
+    /**
+     * @param Cpf $document
+     * @return bool
+     * @throws DriverException
+     * @throws Exception
+     */
+    public function accountExists(Cpf $document): bool
+    {
+        $builder = $this->adapter->createQueryBuilder();
+
+        $statement = $builder->select('count(1)')
+            ->from('account_events')
+            ->where("payload like '%:document%'")
+            ->setParameter(':document', $document->getValue())
+            ->execute();
+
+        $result = $statement->fetchNumeric();
+
+        if ($result[0] > 1) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -52,81 +68,13 @@ class AccountRepository implements Repository
 
         $collection = new EventRecordCollection();
 
+        $factory = new Factory();
+
         foreach ($result as $item) {
-            $collection->add($this->buildEventRecord($item));
+            $collection->add($factory->buildEventRecord($item));
         }
 
-        return Account::reconstitute($cpf, $collection);
-    }
-
-    /**
-     * @param array $item
-     * @return EventRecord
-     * @throws \Exception
-     */
-    private function buildEventRecord(array $item): EventRecord
-    {
-        $id = $item["code"];
-        $identity = $item["aggregate_id"];
-        $domainEvent = $this->identifyDomainEvent($item["event_name"], $item["payload"]);
-        $revision = $item["revision"];
-        $sequenceNumber = $item["sequence_number"];
-        $eventName = $item["event_name"];
-        $occurredOn = new DateTimeImmutable($item["occurred_on"]);
-        $aggregateType = $item["aggregate_type"];
-
-        return new EventRecord(
-            $id,
-            $identity,
-            $domainEvent,
-            $revision,
-            $sequenceNumber,
-            $eventName,
-            $occurredOn,
-            $aggregateType
-        );
-    }
-
-    /**
-     * @param String $domainName
-     * @param String $payload
-     * @return DomainEvent
-     * @throws \Exception
-     */
-    private function identifyDomainEvent(string $domainName, string $payload): DomainEvent
-    {
-        $eventObj = json_decode($payload);
-
-        return match ($domainName) {
-            "AccountCreated" => new AccountCreated(
-                new Cpf($eventObj->accountId->cpf),
-                new Amount($eventObj->amount->value, new Currency($eventObj->amount->currency)),
-                new DateTimeImmutable($eventObj->occurredOn)
-            ),
-            "WithdrawPerformed" => new WithdrawPerformed(
-                new Cpf($eventObj->accountId->cpf),
-                new FinancialTransaction(
-                    new DateTimeImmutable($eventObj->financialTransaction->createdAt),
-                    new Amount(
-                        $eventObj->financialTransaction->amount->value,
-                        new Currency($eventObj->financialTransaction->amount->currency)
-                    ),
-                    $eventObj->financialTransaction->type
-                )
-            ),
-            "DepositPerformed" => new DepositPerformed(
-                new Cpf($eventObj->accountId->cpf),
-                new FinancialTransaction(
-                    new DateTimeImmutable($eventObj->financialTransaction->createdAt),
-                    new Amount(
-                        $eventObj->financialTransaction->amount->value,
-                        new Currency($eventObj->financialTransaction->amount->currency)
-                    ),
-                    $eventObj->financialTransaction->type
-                )
-            ),
-            default => throw new \DomainException("Event not supported"),
-        };
+        return Account::replay($cpf, $collection);
     }
 
     /**

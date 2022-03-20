@@ -13,7 +13,7 @@ trait EntityCapabilities
      */
     public function getIdentity(): Identity
     {
-        $result = $this->{$this->getIdentityName()};
+        $result = $this->{$this->getIdentityPropertyName()};
 
         if ($result && is_a($result, Identity::class)) {
             return $result;
@@ -26,11 +26,11 @@ trait EntityCapabilities
      * @return string
      * @throws ReflectionException
      */
-    public function getIdentityName(): string
+    public function getIdentityPropertyName(): string
     {
         $result = $this->getIdentityProperty();
 
-        if ($result && (new Properties())->exists($this, $result)) {
+        if ($result && (new ReflectionClassProperties())->exists($this, $result)) {
             return $result;
         }
 

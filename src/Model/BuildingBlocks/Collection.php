@@ -1,6 +1,6 @@
 <?php
 
-namespace Banking\Account\Model\BuildingBlocks\EventSourcing;
+namespace Banking\Account\Model\BuildingBlocks;
 
 trait Collection
 {

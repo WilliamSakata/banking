@@ -12,7 +12,7 @@ interface Entity
     /**
      * @return string
      */
-    public function getIdentityName(): string;
+    public function getIdentityPropertyName(): string;
 
     /**
      * @param Entity $entity

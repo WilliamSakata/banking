@@ -23,5 +23,5 @@ interface EventSourcingRoot extends Entity
      * @param EventRecordCollection $records
      * @return EventSourcingRoot
      */
-    public static function reconstitute(Identity $identity, EventRecordCollection $records): EventSourcingRoot;
+    public static function replay(Identity $identity, EventRecordCollection $records): EventSourcingRoot;
 }

@@ -2,13 +2,13 @@
 
 namespace Banking\Account\Model;
 
+use Banking\Account\Model\BuildingBlocks\ValueObject\ImmutableCapabilities;
 use Banking\Account\Model\BuildingBlocks\ValueObject\ValueObject;
-use Banking\Account\Model\BuildingBlocks\ValueObject\ValueObjectCapabilities;
 use LogicException;
 
 final class Amount implements ValueObject
 {
-    use ValueObjectCapabilities;
+    use ImmutableCapabilities;
 
     public const ZERO = 0.0;
 

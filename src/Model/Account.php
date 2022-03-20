@@ -38,7 +38,11 @@ final class Account implements EventSourcingRoot
      */
     public function create(): void
     {
-        $event = new AccountCreated($this->document, new Amount(0, new Currency('BRL')), new DateTimeImmutable());
+        $event = new AccountCreated(
+            $this->document,
+            new Amount(0, new Currency('BRL')),
+            new DateTimeImmutable()
+        );
 
         $this->trigger($event);
     }
@@ -49,6 +53,7 @@ final class Account implements EventSourcingRoot
      */
     public function onAccountCreated(AccountCreated $accountCreated): void
     {
+        $this->sequenceNumber = $this->getSequenceNumber()->next();
         $this->document = $accountCreated->getAccountId();
         $this->balance = new Balance($accountCreated->getAmount()->getValue());
         $this->financialTransactionCollection = new FinancialTransactionCollection();
@@ -66,7 +71,11 @@ final class Account implements EventSourcingRoot
 
         $amount = new Amount($withdraw->getAmount()->getValue(), $withdraw->getAmount()->getCurrency());
 
-        $financialTransaction = new FinancialTransaction(new DateTimeImmutable(), $amount, FinancialTransactionType::DEBIT);
+        $financialTransaction = new FinancialTransaction(
+            new DateTimeImmutable(),
+            $amount,
+            FinancialTransactionType::DEBIT
+        );
 
         $event = new WithdrawPerformed($withdraw->getDocument(), $financialTransaction);
         $this->trigger($event);
@@ -78,8 +87,9 @@ final class Account implements EventSourcingRoot
      */
     public function onWithdrawPerformed(WithdrawPerformed $withdrawPerformed): void
     {
+        $this->sequenceNumber = $this->getSequenceNumber()->next();
         $this->document = $withdrawPerformed->getAccountId();
-        $newBalance = $this->balance->getAmount() - $withdrawPerformed->getFinancialTransaction()->getAmount()->getValue();
+        $newBalance = $this->balance->getValue() - $withdrawPerformed->getFinancialTransaction()->getAmount()->getValue();
         $this->balance = new Balance($newBalance);
         $this->financialTransactionCollection->add($withdrawPerformed->getFinancialTransaction());
     }
@@ -90,7 +100,7 @@ final class Account implements EventSourcingRoot
      */
     private function withoutBalance(Amount $value): bool
     {
-        if ($this->balance->getAmount() < $value->getValue()) {
+        if ($this->balance->getValue() < $value->getValue()) {
             return true;
         }
 
@@ -122,8 +132,9 @@ final class Account implements EventSourcingRoot
      */
     public function onDepositPerformed(DepositPerformed $depositPerformed): void
     {
+        $this->sequenceNumber = $this->getSequenceNumber()->next();
         $this->document = $depositPerformed->getAccountId();
-        $newBalance = $this->balance->getAmount() + $depositPerformed->getFinancialTransaction()->getAmount()->getValue();
+        $newBalance = $this->balance->getValue() + $depositPerformed->getFinancialTransaction()->getAmount()->getValue();
         $this->balance = new Balance($newBalance);
         $this->financialTransactionCollection->add($depositPerformed->getFinancialTransaction());
     }

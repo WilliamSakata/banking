@@ -3,13 +3,12 @@
 namespace Banking\Account\Model;
 
 use Banking\Account\Model\BuildingBlocks\Identity;
-use Banking\Account\Model\BuildingBlocks\IdentityCapabilities;
+use Banking\Account\Model\BuildingBlocks\ValueObject\SingleValueObjectCapabilities;
 use InvalidArgumentException;
-use PhpParser\Node\Expr\Array_;
 
 class Cpf implements Identity
 {
-    use IdentityCapabilities;
+    use SingleValueObjectCapabilities;
 
     /**
      * @param string $value

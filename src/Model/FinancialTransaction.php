@@ -2,16 +2,20 @@
 
 namespace Banking\Account\Model;
 
+use Banking\Account\Model\BuildingBlocks\ValueObject\ImmutableCapabilities;
+use Banking\Account\Model\BuildingBlocks\ValueObject\ValueObject;
 use DateTimeImmutable;
 
-final class FinancialTransaction
+final class FinancialTransaction implements ValueObject
 {
+    use ImmutableCapabilities;
+
     /**
      * @param DateTimeImmutable $createdAt
      * @param Amount $amount
-     * @param string $type
+     * @param FinancialTransactionType $type
      */
-    public function __construct(private DateTimeImmutable $createdAt, private Amount $amount, private string $type)
+    public function __construct(private DateTimeImmutable $createdAt, private Amount $amount, private FinancialTransactionType $type)
     {
     }
 
@@ -32,9 +36,9 @@ final class FinancialTransaction
     }
 
     /**
-     * @return string
+     * @return FinancialTransactionType
      */
-    public function getType(): string
+    public function getType(): FinancialTransactionType
     {
         return $this->type;
     }
@@ -46,7 +50,7 @@ final class FinancialTransaction
                 'value' => $this->amount->getValue(),
                 'currency' => $this->amount->getCurrency()->getValue()
             ],
-            'type' => $this->type,
+            'type' => $this->type->value,
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s')
         ];
     }

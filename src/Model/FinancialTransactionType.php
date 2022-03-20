@@ -2,8 +2,8 @@
 
 namespace Banking\Account\Model;
 
-final class FinancialTransactionType
+enum FinancialTransactionType : string
 {
-    const DEBIT = 'D';
-    const CREDIT = 'C';
+    case DEBIT = 'D';
+    case CREDIT = 'C';
 }

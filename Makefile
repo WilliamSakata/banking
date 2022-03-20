@@ -1,4 +1,5 @@
 DOCKER_RUN = docker run -u root --rm -i -v ${PWD}:/app -w /app php:8-fpm-alpine
+FLYWAY = docker run --rm -v ${PWD}/db/migration/safe_adm:/flyway/sql/safe_adm -v ${PWD}/db/migration/safe_adm_test:/flyway/sql/safe_adm_test --env-file=ecs/local/configs.env --network=bco_default -e FLYWAY_EDITION="community" flyway/flyway:7.15.0
 
 configure:
 	@${DOCKER_RUN} composer update --optimize-autoloader

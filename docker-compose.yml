@@ -42,7 +42,7 @@ services:
     links:
       - "mysql:database.localhost"
     volumes:
-      - "./sql:/flyway/sql"
+      - "./db/migration/banking:/flyway/sql/banking"
       - "./config/flyway.conf:/flyway/conf/flyway.conf"
     depends_on:
       - mysql
@@ -71,5 +71,5 @@ services:
       - bank-account
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.account-nginx.rule=Host(`account.localhost`)"
-      - "traefik.http.routers.account-nginx.entrypoints=web"
+      - "traefik.Http.routers.account-nginx.rule=Host(`account.localhost`)"
+      - "traefik.Http.routers.account-nginx.entrypoints=web"

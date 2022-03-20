@@ -2,29 +2,23 @@
 
 namespace Banking\Account\Model;
 
-use Banking\Account\Model\BuildingBlocks\ValueObject\ValueObject;
-use Banking\Account\Model\BuildingBlocks\ValueObject\ValueObjectCapabilities;
+use Banking\Account\Model\BuildingBlocks\ValueObject\SingleValueObject;
+use Banking\Account\Model\BuildingBlocks\ValueObject\SingleValueObjectCapabilities;
 use LogicException;
 
-final class Balance implements ValueObject
+final class Balance implements SingleValueObject
 {
-    use ValueObjectCapabilities;
+    use SingleValueObjectCapabilities;
 
     /**
      * @param float $amount
      */
-    public function __construct(private float $amount)
+    public function __construct(float $amount)
     {
         if ($amount < 0) {
             throw new LogicException('Invalid amount for balance');
         }
-    }
 
-    /**
-     * @return float
-     */
-    public function getAmount(): float
-    {
-        return $this->amount;
+        $this->value = $amount;
     }
 }

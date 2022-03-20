@@ -7,7 +7,7 @@ use Banking\Account\Model\BuildingBlocks\DomainEvent;
 final class WithdrawPerformed implements DomainEvent
 {
     private const REVISION = 1;
-    private const AGGREGATE_TYPE = 'AccountDebited';
+    private const AGGREGATE_TYPE = 'Account';
 
     /**
      * @param Cpf $accountId

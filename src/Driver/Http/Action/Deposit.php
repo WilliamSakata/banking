@@ -1,15 +1,15 @@
 <?php
 
-namespace Banking\Account\Driver\Action;
+namespace Banking\Account\Driver\Http\Action;
 
 use Banking\Account\Command\Deposit\Deposit as DepositUseCase;
 use Banking\Account\Command\Deposit\DepositHandler;
 use Banking\Account\Model\Amount;
-use Banking\Account\Model\Currency;
 use Banking\Account\Model\Cpf;
+use Banking\Account\Model\Currency;
 use Exception;
-use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class Deposit
 {

@@ -7,7 +7,7 @@ use DateTimeImmutable;
 
 class AccountCreated implements DomainEvent
 {
-    private const AGGREGATE_TYPE = 'AccountCreated';
+    private const AGGREGATE_TYPE = 'Account';
     private const REVISION = 1;
 
     private Cpf $accountId;

@@ -28,7 +28,7 @@ trait EventSourcingCapabilities
      */
     private function __construct(private Identity $identity, private Version $sequenceNumber)
     {
-        $this->{$this->getIdentityName()} = $this->identity;
+        $this->{$this->getIdentityPropertyName()} = $this->identity;
         $this->recordedEvents = new EventRecordCollection();
     }
 
@@ -47,7 +47,7 @@ trait EventSourcingCapabilities
      */
     public static function blank(Identity $identity): EventSourcingRoot
     {
-        return new static($identity, new Version(0));
+        return new self($identity, new Version(0));
     }
 
     /**
@@ -56,7 +56,7 @@ trait EventSourcingCapabilities
      * @return EventSourcingRoot
      * @throws ReflectionException
      */
-    public static function reconstitute(Identity $identity, EventRecordCollection $records): EventSourcingRoot
+    public static function replay(Identity $identity, EventRecordCollection $records): EventSourcingRoot
     {
         $aggregate = static::blank($identity);
 
@@ -81,7 +81,7 @@ trait EventSourcingCapabilities
             $event,
             $event->getRevision(),
             $this->sequenceNumber->getValue(),
-            (new \ReflectionClass($event::class))->getShortName(),
+            (new ReflectionClass($event::class))->getShortName(),
             new DateTimeImmutable(),
             $event->getAggregateType()
         );

@@ -7,7 +7,7 @@ use Banking\Account\Model\BuildingBlocks\DomainEvent;
 class DepositPerformed implements DomainEvent
 {
     private const REVISION = 1;
-    private const AGGREGATE_TYPE = 'AccountCredited';
+    private const AGGREGATE_TYPE = 'Account';
 
     public function __construct(private Cpf $accountId, private FinancialTransaction $financialTransaction)
     {

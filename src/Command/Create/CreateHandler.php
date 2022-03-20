@@ -18,11 +18,28 @@ class CreateHandler
     /**
      * @param Create $create
      * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
     public function __invoke(Create $create)
     {
+        if ($this->accountExists($create)) {
+            return;
+        }
+
         $account = Account::blank($create->getDocument());
+
         $account->create();
         $this->accountRepository->push($account);
+    }
+
+    /**
+     * @param Create $create
+     * @return bool
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function accountExists(Create $create): bool
+    {
+        return $this->accountRepository->accountExists($create->getDocument());
     }
 }
