@@ -3,6 +3,8 @@
 namespace Banking\Account\Model;
 
 use Banking\Account\Model\BuildingBlocks\DomainEvent;
+use Banking\Account\Model\errors\InvalidFinancialTransactionType;
+use ReflectionClass;
 
 class DepositPerformed implements DomainEvent
 {
@@ -11,6 +13,14 @@ class DepositPerformed implements DomainEvent
 
     public function __construct(private Cpf $accountId, private FinancialTransaction $financialTransaction)
     {
+        if ($this->financialTransaction->getType() != FinancialTransactionType::CREDIT) {
+            $reflected = new ReflectionClass($this);
+
+            throw new InvalidFinancialTransactionType(
+                FinancialTransactionType::DEBIT->value,
+                $reflected->getShortName()
+            );
+        }
     }
 
     /**

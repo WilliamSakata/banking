@@ -4,7 +4,7 @@ namespace Banking\Account\Model;
 
 use Banking\Account\Model\BuildingBlocks\ValueObject\SingleValueObject;
 use Banking\Account\Model\BuildingBlocks\ValueObject\SingleValueObjectCapabilities;
-use LogicException;
+use Banking\Account\Model\errors\InvalidCurrency;
 
 final class Currency implements SingleValueObject
 {
@@ -18,7 +18,7 @@ final class Currency implements SingleValueObject
     public function __construct(string $value)
     {
         if (strlen($value) !== self::SIZE) {
-            throw new LogicException(sprintf('Invalid currency %s', $value));
+            throw new InvalidCurrency($value);
         }
 
         $this->value = strtoupper($value);

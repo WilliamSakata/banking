@@ -5,26 +5,26 @@ namespace Banking\Account\Model\BuildingBlocks\ValueObject;
 interface Immutable
 {
     /**
-     * @param $key
+     * @param  $key
      * @return mixed
      */
     public function __get($key);
 
     /**
-     * @param $key
-     * @param $value
+     * @param  $key
+     * @param  $value
      * @return mixed
      */
     public function __set($key, $value);
 
     /**
-     * @param $key
+     * @param  $key
      * @return mixed
      */
     public function __unset($key);
 
     /**
-     * @param Immutable $obj
+     * @param  Immutable $obj
      * @return mixed
      */
     public function equals(Immutable $obj): bool;

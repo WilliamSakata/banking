@@ -18,7 +18,7 @@ class Withdraw
     private Amount $amount;
 
     /**
-     * @param Cpf $document
+     * @param Cpf    $document
      * @param Amount $amount
      */
     public function __construct(Cpf $document, Amount $amount)

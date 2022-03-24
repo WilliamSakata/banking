@@ -18,9 +18,9 @@ class MySqlAdapter
     }
 
     /**
-     * @param string $sql
-     * @param array $params
-     * @param array $types
+     * @param  string $sql
+     * @param  array  $params
+     * @param  array  $types
      * @return int
      * @throws Exception
      */

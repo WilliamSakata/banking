@@ -21,7 +21,7 @@ class AccountRepository implements Repository
     }
 
     /**
-     * @param Cpf $document
+     * @param  Cpf $document
      * @return bool
      * @throws DriverException
      * @throws Exception
@@ -46,7 +46,7 @@ class AccountRepository implements Repository
     }
 
     /**
-     * @param Cpf $cpf
+     * @param  Cpf $cpf
      * @return Account
      * @throws DriverException
      * @throws Exception
@@ -78,7 +78,7 @@ class AccountRepository implements Repository
     }
 
     /**
-     * @param Account $account
+     * @param  Account $account
      * @throws Exception
      */
     public function push(Account $account): void
@@ -86,9 +86,10 @@ class AccountRepository implements Repository
         try {
             $this->adapter->beginTransaction();
 
-            /** @var EventRecord $recordedEvent */
+            /**
+ * @var EventRecord $recordedEvent
+*/
             foreach ($account->getRecordedEvents()->getList() as $recordedEvent) {
-
                 $builder = $this->adapter->createQueryBuilder();
 
                 $builder->insert('account_events')

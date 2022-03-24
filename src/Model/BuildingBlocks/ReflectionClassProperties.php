@@ -8,8 +8,8 @@ use ReflectionException;
 class ReflectionClassProperties
 {
     /**
-     * @param mixed $class
-     * @param string $propertyName
+     * @param  mixed  $class
+     * @param  string $propertyName
      * @return bool
      * @throws ReflectionException
      */
@@ -19,7 +19,7 @@ class ReflectionClassProperties
     }
 
     /**
-     * @param mixed $className
+     * @param  mixed $className
      * @return array
      * @throws ReflectionException
      */

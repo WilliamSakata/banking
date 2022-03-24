@@ -3,6 +3,8 @@
 namespace Banking\Account\Model;
 
 use Banking\Account\Model\BuildingBlocks\DomainEvent;
+use Banking\Account\Model\errors\InvalidFinancialTransactionType;
+use ReflectionClass;
 
 final class WithdrawPerformed implements DomainEvent
 {
@@ -10,11 +12,19 @@ final class WithdrawPerformed implements DomainEvent
     private const AGGREGATE_TYPE = 'Account';
 
     /**
-     * @param Cpf $accountId
+     * @param Cpf                  $accountId
      * @param FinancialTransaction $financialTransaction
      */
     public function __construct(private Cpf $accountId, private FinancialTransaction $financialTransaction)
     {
+        if ($this->financialTransaction->getType() != FinancialTransactionType::DEBIT) {
+            $reflected = new ReflectionClass($this);
+
+            throw new InvalidFinancialTransactionType(
+                $this->financialTransaction->getType()->value,
+                $reflected->getShortName()
+            );
+        }
     }
 
     /**

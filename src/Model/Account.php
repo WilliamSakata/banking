@@ -7,8 +7,9 @@ use Banking\Account\Command\Withdraw\Withdraw;
 use Banking\Account\Model\BuildingBlocks\EventSourcing\EventSourcingCapabilities;
 use Banking\Account\Model\BuildingBlocks\EventSourcing\EventSourcingRoot;
 use Banking\Account\Model\BuildingBlocks\Version;
+use Banking\Account\Model\errors\DepositLimitReached;
+use Banking\Account\Model\errors\InsufficientBalance;
 use DateTimeImmutable;
-use DomainException;
 use Exception;
 
 final class Account implements EventSourcingRoot
@@ -48,32 +49,31 @@ final class Account implements EventSourcingRoot
     }
 
     /**
-     * @param AccountCreated $accountCreated
+     * @param        AccountCreated $accountCreated
      * @noinspection PhpUnused
      */
     public function onAccountCreated(AccountCreated $accountCreated): void
     {
-        $this->sequenceNumber = $this->getSequenceNumber()->next();
         $this->document = $accountCreated->getAccountId();
         $this->balance = new Balance($accountCreated->getAmount()->getValue());
         $this->financialTransactionCollection = new FinancialTransactionCollection();
     }
 
     /**
-     * @param Withdraw $withdraw
+     * @param  Withdraw $withdraw
      * @throws Exception
      */
     public function withDraw(Withdraw $withdraw): void
     {
         if ($this->withoutBalance($withdraw->getAmount())) {
-            throw new DomainException('Insufficient balance');
+            throw new InsufficientBalance();
         }
 
         $amount = new Amount($withdraw->getAmount()->getValue(), $withdraw->getAmount()->getCurrency());
 
         $financialTransaction = new FinancialTransaction(
-            new DateTimeImmutable(),
             $amount,
+            new DateTimeImmutable(),
             FinancialTransactionType::DEBIT
         );
 
@@ -82,20 +82,21 @@ final class Account implements EventSourcingRoot
     }
 
     /**
-     * @param WithdrawPerformed $withdrawPerformed
+     * @param        WithdrawPerformed $withdrawPerformed
      * @noinspection PhpUnused
      */
     public function onWithdrawPerformed(WithdrawPerformed $withdrawPerformed): void
     {
-        $this->sequenceNumber = $this->getSequenceNumber()->next();
         $this->document = $withdrawPerformed->getAccountId();
-        $newBalance = $this->balance->getValue() - $withdrawPerformed->getFinancialTransaction()->getAmount()->getValue();
+        $newBalance =
+            $this->balance->getValue() - $withdrawPerformed->getFinancialTransaction()->getAmount()->getValue();
+
         $this->balance = new Balance($newBalance);
         $this->financialTransactionCollection->add($withdrawPerformed->getFinancialTransaction());
     }
 
     /**
-     * @param Amount $value
+     * @param  Amount $value
      * @return bool
      */
     private function withoutBalance(Amount $value): bool
@@ -108,18 +109,22 @@ final class Account implements EventSourcingRoot
     }
 
     /**
-     * @param Deposit $deposit
+     * @param  Deposit $deposit
      * @throws Exception
      */
     public function deposit(Deposit $deposit): void
     {
         if ($deposit->getAmount()->getValue() > self::DEPOSIT_LIMIT) {
-            throw new DomainException('Deposit limit reached. The max value allowed is 10000');
+            throw new DepositLimitReached(self::DEPOSIT_LIMIT);
         }
 
         $amount = new Amount($deposit->getAmount()->getValue(), $deposit->getAmount()->getCurrency());
 
-        $financialTransaction = new FinancialTransaction(new DateTimeImmutable(), $amount, FinancialTransactionType::CREDIT);
+        $financialTransaction = new FinancialTransaction(
+            $amount,
+            new DateTimeImmutable(),
+            FinancialTransactionType::CREDIT
+        );
 
         $event = new DepositPerformed($deposit->getDocument(), $financialTransaction);
 
@@ -127,14 +132,15 @@ final class Account implements EventSourcingRoot
     }
 
     /**
-     * @param DepositPerformed $depositPerformed
+     * @param        DepositPerformed $depositPerformed
      * @noinspection PhpUnused
      */
     public function onDepositPerformed(DepositPerformed $depositPerformed): void
     {
-        $this->sequenceNumber = $this->getSequenceNumber()->next();
         $this->document = $depositPerformed->getAccountId();
-        $newBalance = $this->balance->getValue() + $depositPerformed->getFinancialTransaction()->getAmount()->getValue();
+        $newBalance =
+            $this->balance->getValue() + $depositPerformed->getFinancialTransaction()->getAmount()->getValue();
+
         $this->balance = new Balance($newBalance);
         $this->financialTransactionCollection->add($depositPerformed->getFinancialTransaction());
     }

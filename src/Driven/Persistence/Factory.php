@@ -19,7 +19,7 @@ use Exception;
 class Factory
 {
     /**
-     * @param array $item
+     * @param  array $item
      * @return EventRecord
      * @throws Exception
      */
@@ -47,8 +47,8 @@ class Factory
     }
 
     /**
-     * @param String $eventName
-     * @param String $payload
+     * @param  String $eventName
+     * @param  String $payload
      * @return DomainEvent
      * @throws Exception
      */
@@ -65,22 +65,22 @@ class Factory
             "WithdrawPerformed" => new WithdrawPerformed(
                 new Cpf($eventObj->accountId->cpf),
                 new FinancialTransaction(
-                    new DateTimeImmutable($eventObj->financialTransaction->createdAt),
                     new Amount(
                         $eventObj->financialTransaction->amount->value,
                         new Currency($eventObj->financialTransaction->amount->currency)
                     ),
+                    new DateTimeImmutable($eventObj->financialTransaction->createdAt),
                     FinancialTransactionType::from($eventObj->financialTransaction->type)
                 )
             ),
             "DepositPerformed" => new DepositPerformed(
                 new Cpf($eventObj->accountId->cpf),
                 new FinancialTransaction(
-                    new DateTimeImmutable($eventObj->financialTransaction->createdAt),
                     new Amount(
                         $eventObj->financialTransaction->amount->value,
                         new Currency($eventObj->financialTransaction->amount->currency)
                     ),
+                    new DateTimeImmutable($eventObj->financialTransaction->createdAt),
                     FinancialTransactionType::from($eventObj->financialTransaction->type)
                 )
             ),

@@ -22,7 +22,8 @@ return [
         return new AccountRepositoryAdapter($container->get(MySqlAdapter::class));
     },
     Connection::class => function () {
-        return DriverManager::getConnection([
+        return DriverManager::getConnection(
+            [
             'driver' => 'pdo_mysql',
             'charset' => 'utf8',
             'host' => 'database.localhost',
@@ -30,6 +31,7 @@ return [
             'dbname' => 'bank',
             'user' => 'dev',
             'password' => 'dev'
-        ]);
+            ]
+        );
     }
 ];

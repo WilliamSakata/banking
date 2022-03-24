@@ -15,7 +15,7 @@ interface Entity
     public function getIdentityPropertyName(): string;
 
     /**
-     * @param Entity $entity
+     * @param  Entity $entity
      * @return bool
      */
     public function equals(Entity $entity): bool;

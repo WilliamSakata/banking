@@ -1,8 +1,7 @@
 <?php
 
-namespace Banking\Account\Model\ValueObject;
+namespace Banking\Account\Model;
 
-use Banking\Account\Model\Balance;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +12,7 @@ class BalanceTest extends TestCase
         $amount = 99.00;
         $balance = new Balance($amount);
 
-        self::assertEquals($amount, $balance->getAmount());
+        self::assertEquals($amount, $balance->getValue());
     }
 
     public function testInvalidAmountForBalance(): void

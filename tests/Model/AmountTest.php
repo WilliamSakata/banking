@@ -1,9 +1,7 @@
 <?php
 
-namespace Banking\Account\Model\ValueObject;
+namespace Banking\Account\Model;
 
-use Banking\Account\Model\Amount;
-use Banking\Account\Model\Currency;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 

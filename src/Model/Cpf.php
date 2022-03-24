@@ -4,7 +4,7 @@ namespace Banking\Account\Model;
 
 use Banking\Account\Model\BuildingBlocks\Identity;
 use Banking\Account\Model\BuildingBlocks\ValueObject\SingleValueObjectCapabilities;
-use InvalidArgumentException;
+use Banking\Account\Model\errors\InvalidDocument;
 
 class Cpf implements Identity
 {
@@ -16,14 +16,14 @@ class Cpf implements Identity
     public function __construct(string $value)
     {
         if (!$this->isValid($value)) {
-            throw new InvalidArgumentException('CPF inválido');
+            throw new InvalidDocument();
         }
 
         $this->value = $value;
     }
 
     /**
-     * @param string $value
+     * @param  string $value
      * @return bool
      */
     private function isValid(string $value): bool

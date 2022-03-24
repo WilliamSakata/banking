@@ -2,6 +2,7 @@
 
 namespace Banking\Account\Model;
 
+use Banking\Account\Model\errors\InvalidFinancialTransactionType;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
@@ -19,14 +20,14 @@ class DepositPerformedTest extends TestCase
         $this->occurredOn = new DateTimeImmutable();
     }
 
-    public function testDepositPerformedEvent()
+    public function testDepositPerformedEvent(): void
     {
         $financialTransaction = new FinancialTransaction(
-            $this->occurredOn,
             new Amount(
                 100,
                 new Currency(self::CURRENCY)
             ),
+            $this->occurredOn,
             FinancialTransactionType::CREDIT
         );
 
@@ -37,6 +38,19 @@ class DepositPerformedTest extends TestCase
 
         static::assertEquals(self::CPF, $actual->getAccountId()->getValue());
         static::assertEquals($this->financialTransactionArray(), $actual->getFinancialTransaction()->toArray());
+    }
+
+    public function testInvalidFinancialTransaction(): void
+    {
+        $this->expectException(InvalidFinancialTransactionType::class);
+        $this->expectErrorMessage('Invalid financial transaction type D for DepositPerformed event');
+
+        $date = new DateTimeImmutable();
+        $document = new Cpf(self::CPF);
+        $amount = new Amount(10, new Currency('BRL'));
+        $financialTransaction = new FinancialTransaction($amount, $date, FinancialTransactionType::DEBIT);
+
+        new DepositPerformed($document, $financialTransaction);
     }
 
     private function financialTransactionArray(): array

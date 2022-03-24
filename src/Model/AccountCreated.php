@@ -10,20 +10,13 @@ class AccountCreated implements DomainEvent
     private const AGGREGATE_TYPE = 'Account';
     private const REVISION = 1;
 
-    private Cpf $accountId;
-    private Amount $amount;
-    private DateTimeImmutable $occurredOn;
-
     /**
-     * @param Cpf $accountId
-     * @param Amount $amount
+     * @param Cpf               $accountId
+     * @param Amount            $amount
      * @param DateTimeImmutable $occurredOn
      */
-    public function __construct(Cpf $accountId, Amount $amount, DateTimeImmutable $occurredOn)
+    public function __construct(private Cpf $accountId, private Amount $amount, private DateTimeImmutable $occurredOn)
     {
-        $this->accountId = $accountId;
-        $this->amount = $amount;
-        $this->occurredOn = $occurredOn;
     }
 
     /**
@@ -72,9 +65,9 @@ class AccountCreated implements DomainEvent
     public function toArray(): array
     {
         return [
-          'accountId' => $this->accountId->toArray(),
-          'amount' => $this->amount->toArray(),
-          'occurredOn' => $this->occurredOn->format('Y-m-d H:i:s')
+            'accountId' => $this->accountId->toArray(),
+            'amount' => $this->amount->toArray(),
+            'occurredOn' => $this->occurredOn->format('Y-m-d H:i:s')
         ];
     }
 }

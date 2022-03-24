@@ -22,8 +22,8 @@ trait EventSourcingCapabilities
     private EventRecordCollection $recordedEvents;
 
     /**
-     * @param Identity $identity
-     * @param Version $sequenceNumber
+     * @param  Identity $identity
+     * @param  Version  $sequenceNumber
      * @throws ReflectionException
      */
     private function __construct(private Identity $identity, private Version $sequenceNumber)
@@ -41,7 +41,7 @@ trait EventSourcingCapabilities
     }
 
     /**
-     * @param Identity $identity
+     * @param  Identity $identity
      * @return EventSourcingRoot
      * @throws ReflectionException
      */
@@ -51,8 +51,8 @@ trait EventSourcingCapabilities
     }
 
     /**
-     * @param Identity $identity
-     * @param EventRecordCollection $records
+     * @param  Identity              $identity
+     * @param  EventRecordCollection $records
      * @return EventSourcingRoot
      * @throws ReflectionException
      */
@@ -108,7 +108,7 @@ trait EventSourcingCapabilities
     }
 
     /**
-     * @param DomainEvent $event
+     * @param  DomainEvent $event
      * @return string
      */
     private function onEvent(DomainEvent $event): string

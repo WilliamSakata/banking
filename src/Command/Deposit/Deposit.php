@@ -9,7 +9,7 @@ class Deposit
 {
     /**
      * @param Amount $amount
-     * @param Cpf $document
+     * @param Cpf    $document
      */
     public function __construct(private Cpf $document, private Amount $amount)
     {

@@ -7,7 +7,7 @@ interface DomainEvent
     /**
      * @return int
      */
-    public  function getRevision(): int;
+    public function getRevision(): int;
 
     /**
      * @return string

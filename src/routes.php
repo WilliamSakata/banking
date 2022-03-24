@@ -9,6 +9,7 @@ use Banking\Account\Driver\Http\Action\Withdraw;
 /**
  * @noinspection PhpUndefinedVariableInspection
  */
+
 $app->post('/withdraw', Withdraw::class);
 $app->post('/deposit', Deposit::class);
 $app->post('/create', Create::class);

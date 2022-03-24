@@ -15,7 +15,7 @@ class DepositHandler
     }
 
     /**
-     * @param Deposit $deposit
+     * @param  Deposit $deposit
      * @throws Exception
      */
     public function __invoke(Deposit $deposit)

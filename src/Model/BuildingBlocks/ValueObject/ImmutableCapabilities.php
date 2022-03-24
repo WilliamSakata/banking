@@ -36,7 +36,7 @@ trait ImmutableCapabilities
     }
 
     /**
-     * @param Immutable $obj
+     * @param  Immutable $obj
      * @return bool
      */
     public function equals(Immutable $obj): bool

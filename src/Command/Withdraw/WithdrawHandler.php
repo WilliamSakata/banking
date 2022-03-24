@@ -15,7 +15,7 @@ class WithdrawHandler
     }
 
     /**
-     * @param Withdraw $withdraw
+     * @param  Withdraw $withdraw
      * @throws Exception
      */
     public function __invoke(Withdraw $withdraw)

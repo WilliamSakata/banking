@@ -4,7 +4,7 @@ namespace Banking\Account\Model;
 
 use Banking\Account\Model\BuildingBlocks\ValueObject\ImmutableCapabilities;
 use Banking\Account\Model\BuildingBlocks\ValueObject\ValueObject;
-use LogicException;
+use Banking\Account\Model\errors\DifferentCurrencies;
 
 final class Amount implements ValueObject
 {
@@ -13,7 +13,7 @@ final class Amount implements ValueObject
     public const ZERO = 0.0;
 
     /**
-     * @param float $value
+     * @param float    $value
      * @param Currency $currency
      */
     public function __construct(private float $value, private Currency $currency)
@@ -21,7 +21,7 @@ final class Amount implements ValueObject
     }
 
     /**
-     * @param Amount $amount
+     * @param  Amount $amount
      * @return Amount
      */
     public function add(Amount $amount): Amount
@@ -31,7 +31,7 @@ final class Amount implements ValueObject
     }
 
     /**
-     * @param Amount $amount
+     * @param  Amount $amount
      * @return Amount
      */
     public function sub(Amount $amount): Amount
@@ -46,7 +46,7 @@ final class Amount implements ValueObject
     private function validateCurrency(Amount $amount): void
     {
         if ($amount->getCurrency()->getValue() !== $this->currency->getValue()) {
-            throw new LogicException('Currencies cannot be different');
+            throw new DifferentCurrencies();
         }
     }
 

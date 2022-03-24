@@ -11,12 +11,15 @@ final class FinancialTransaction implements ValueObject
     use ImmutableCapabilities;
 
     /**
-     * @param DateTimeImmutable $createdAt
-     * @param Amount $amount
+     * @param DateTimeImmutable        $createdAt
+     * @param Amount                   $amount
      * @param FinancialTransactionType $type
      */
-    public function __construct(private DateTimeImmutable $createdAt, private Amount $amount, private FinancialTransactionType $type)
-    {
+    public function __construct(
+        private Amount $amount,
+        private DateTimeImmutable $createdAt,
+        private FinancialTransactionType $type
+    ) {
     }
 
     /**

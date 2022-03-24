@@ -8,26 +8,25 @@ use DateTimeImmutable;
 class EventRecord
 {
     /**
-     * @param string $id
-     * @param string $identity
-     * @param DomainEvent $domainEvent
-     * @param int $revision
-     * @param int $sequenceNumber
-     * @param string $eventName
+     * @param string            $id
+     * @param string            $identity
+     * @param DomainEvent       $domainEvent
+     * @param int               $revision
+     * @param int               $sequenceNumber
+     * @param string            $eventName
      * @param DateTimeImmutable $occurredOn
-     * @param string $aggregateType
+     * @param string            $aggregateType
      */
     public function __construct(
-        private string            $id,
-        private string            $identity,
-        private DomainEvent       $domainEvent,
-        private int               $revision,
-        private int               $sequenceNumber,
-        private string            $eventName,
+        private string $id,
+        private string $identity,
+        private DomainEvent $domainEvent,
+        private int $revision,
+        private int $sequenceNumber,
+        private string $eventName,
         private DateTimeImmutable $occurredOn,
-        private string            $aggregateType
-    )
-    {
+        private string $aggregateType
+    ) {
     }
 
     /**

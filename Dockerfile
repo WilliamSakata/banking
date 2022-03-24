@@ -9,3 +9,7 @@ RUN apk update \
     && docker-php-ext-enable xdebug \
     && apk del --purge autoconf g++ make \
     && docker-php-ext-install pdo pdo_mysql
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+RUN composer global require "squizlabs/php_codesniffer=*" --dev

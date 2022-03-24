@@ -13,14 +13,14 @@ interface EventSourcingRoot extends Entity
     public function getRecordedEvents(): EventRecordCollection;
 
     /**
-     * @param Identity $identity
+     * @param  Identity $identity
      * @return EventSourcingRoot
      */
     public static function blank(Identity $identity): EventSourcingRoot;
 
     /**
-     * @param Identity $identity
-     * @param EventRecordCollection $records
+     * @param  Identity              $identity
+     * @param  EventRecordCollection $records
      * @return EventSourcingRoot
      */
     public static function replay(Identity $identity, EventRecordCollection $records): EventSourcingRoot;

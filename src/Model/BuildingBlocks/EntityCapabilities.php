@@ -38,7 +38,7 @@ trait EntityCapabilities
     }
 
     /**
-     * @param Entity $entity
+     * @param  Entity $entity
      * @return bool
      * @throws ReflectionException
      */
@@ -47,5 +47,5 @@ trait EntityCapabilities
         return $this->getIdentity()->equals($entity->getIdentity());
     }
 
-    public abstract function getIdentityProperty();
+    abstract public function getIdentityProperty();
 }

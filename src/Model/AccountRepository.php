@@ -5,7 +5,7 @@ namespace Banking\Account\Model;
 interface AccountRepository
 {
     /**
-     * @param Cpf $cpf
+     * @param  Cpf $cpf
      * @return Account
      */
     public function pull(Cpf $cpf): Account;

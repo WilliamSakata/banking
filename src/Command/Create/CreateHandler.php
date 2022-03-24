@@ -16,7 +16,7 @@ class CreateHandler
     }
 
     /**
-     * @param Create $create
+     * @param  Create $create
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
@@ -33,7 +33,7 @@ class CreateHandler
     }
 
     /**
-     * @param Create $create
+     * @param  Create $create
      * @return bool
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws \Doctrine\DBAL\Exception

@@ -20,6 +20,9 @@
     "ramsey/uuid": "^4.2.3",
     "ext-mbstring": "*"
   },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^3.6.2"
+  },
   "autoload": {
     "psr-4": {
       "Banking\\Account\\": "src/"

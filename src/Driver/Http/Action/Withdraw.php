@@ -23,8 +23,8 @@ class Withdraw
     }
 
     /**
-     * @param Request $request
-     * @param Response $response
+     * @param  Request  $request
+     * @param  Response $response
      * @return Response
      * @throws Exception
      */

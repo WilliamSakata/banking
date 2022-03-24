@@ -41,7 +41,7 @@ class AccountTest extends TestCase
         $account->withDraw($withDraw);
 
         static::assertEquals('353.934.420-92', $account->getDocument()->getValue());
-        static::assertEquals(90, $account->getBalance()->getAmount());
+        static::assertEquals(90, $account->getBalance()->getValue());
         static::assertEquals(new Version(3), $account->getSequenceNumber());
 
         static::assertInstanceOf(
@@ -64,7 +64,7 @@ class AccountTest extends TestCase
         );
 
         static::assertEquals(
-            'C',
+            FinancialTransactionType::CREDIT,
             $account->getRecordedEvents()->getList()[1]->getDomainEvent()->getFinancialTransaction()->getType()
         );
 
@@ -79,8 +79,28 @@ class AccountTest extends TestCase
         );
 
         static::assertEquals(
-            'D',
+            FinancialTransactionType::DEBIT,
             $account->getRecordedEvents()->getList()[2]->getDomainEvent()->getFinancialTransaction()->getType()
+        );
+
+        static::assertEquals(
+            new Amount(100, new Currency('BRL')),
+            $account->getFinancialTransactionCollection()->getList()[0]->getAmount()
+        );
+
+        static::assertEquals(
+            FinancialTransactionType::CREDIT,
+            $account->getFinancialTransactionCollection()->getList()[0]->getType()
+        );
+
+        static::assertEquals(
+            new Amount(10, new Currency('BRL')),
+            $account->getFinancialTransactionCollection()->getList()[1]->getAmount()
+        );
+
+        static::assertEquals(
+            FinancialTransactionType::DEBIT,
+            $account->getFinancialTransactionCollection()->getList()[1]->getType()
         );
     }
 
@@ -117,23 +137,5 @@ class AccountTest extends TestCase
 
         $withDraw = new Withdraw(new Cpf(self::DOCUMENT), new Amount( 10, new Currency('BRL')));
         $account->withDraw($withDraw);
-    }
-
-    public function test(): void
-    {
-        /** @var Account $account */
-        $account = Account::blank(new Cpf(self::DOCUMENT));
-        $account->create();
-
-        $deposit = new Deposit($this->cpf, new Amount(100, $this->currency));
-        $account->deposit($deposit);
-
-        $withDraw = new Withdraw(new Cpf(self::DOCUMENT), new Amount( 10, new Currency('BRL')));
-        $account->withDraw($withDraw);
-
-        static::assertEquals(new Amount(100, $this->currency), $account->getFinancialTransactionCollection()->getList()[0]->getAmount());
-        static::assertEquals('C', $account->getFinancialTransactionCollection()->getList()[0]->getType());
-        static::assertEquals(new Amount(10, $this->currency), $account->getFinancialTransactionCollection()->getList()[1]->getAmount());
-        static::assertEquals('D', $account->getFinancialTransactionCollection()->getList()[1]->getType());
     }
 }
