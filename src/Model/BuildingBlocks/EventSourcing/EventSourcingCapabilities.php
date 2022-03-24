@@ -73,14 +73,12 @@ trait EventSourcingCapabilities
      */
     protected function trigger(DomainEvent $event)
     {
-        $this->sequenceNumber = $this->sequenceNumber->next();
-
         $record = new EventRecord(
             Uuid::uuid4()->toString(),
             $this->getIdentity(),
             $event,
             $event->getRevision(),
-            $this->sequenceNumber->getValue(),
+            $this->sequenceNumber->next()->getValue(),
             (new ReflectionClass($event::class))->getShortName(),
             new DateTimeImmutable(),
             $event->getAggregateType()

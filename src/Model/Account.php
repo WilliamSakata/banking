@@ -54,6 +54,8 @@ final class Account implements EventSourcingRoot
      */
     public function onAccountCreated(AccountCreated $accountCreated): void
     {
+        $this->sequenceNumber = $this->getSequenceNumber()->next();
+
         $this->document = $accountCreated->getAccountId();
         $this->balance = new Balance($accountCreated->getAmount()->getValue());
         $this->financialTransactionCollection = new FinancialTransactionCollection();
@@ -88,6 +90,8 @@ final class Account implements EventSourcingRoot
     public function onWithdrawPerformed(WithdrawPerformed $withdrawPerformed): void
     {
         $this->document = $withdrawPerformed->getAccountId();
+        $this->sequenceNumber = $this->getSequenceNumber()->next();
+
         $newBalance =
             $this->balance->getValue() - $withdrawPerformed->getFinancialTransaction()->getAmount()->getValue();
 
@@ -138,6 +142,8 @@ final class Account implements EventSourcingRoot
     public function onDepositPerformed(DepositPerformed $depositPerformed): void
     {
         $this->document = $depositPerformed->getAccountId();
+        $this->sequenceNumber = $this->getSequenceNumber()->next();
+
         $newBalance =
             $this->balance->getValue() + $depositPerformed->getFinancialTransaction()->getAmount()->getValue();
 

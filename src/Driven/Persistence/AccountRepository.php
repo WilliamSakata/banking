@@ -87,8 +87,8 @@ class AccountRepository implements Repository
             $this->adapter->beginTransaction();
 
             /**
- * @var EventRecord $recordedEvent
-*/
+            * @var EventRecord $recordedEvent
+            */
             foreach ($account->getRecordedEvents()->getList() as $recordedEvent) {
                 $builder = $this->adapter->createQueryBuilder();
 
