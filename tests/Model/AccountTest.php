@@ -5,7 +5,8 @@ namespace Banking\Account\Model;
 use Banking\Account\Command\Deposit\Deposit;
 use Banking\Account\Command\Withdraw\Withdraw;
 use Banking\Account\Model\BuildingBlocks\Version;
-use DomainException;
+use Banking\Account\Model\errors\DepositLimitReached;
+use Banking\Account\Model\errors\InsufficientBalance;
 use PHPUnit\Framework\TestCase;
 
 class AccountTest extends TestCase
@@ -111,7 +112,7 @@ class AccountTest extends TestCase
      */
     public function testDepositBeyondLimit(): void
     {
-        $this->expectException(DomainException::class);
+        $this->expectException(DepositLimitReached::class);
         $this->expectExceptionMessage('Deposit limit reached. The max value allowed is 10000');
 
         /** @var Account $account */
@@ -128,7 +129,7 @@ class AccountTest extends TestCase
      */
     public function testWithdrawWithoutBalance(): void
     {
-        $this->expectException(DomainException::class);
+        $this->expectException(InsufficientBalance::class);
         $this->expectExceptionMessage('Insufficient balance');
 
         /** @var Account $account */

@@ -2,7 +2,7 @@
 
 namespace Banking\Account\Model;
 
-use LogicException;
+use Banking\Account\Model\errors\InvalidBalance;
 use PHPUnit\Framework\TestCase;
 
 class BalanceTest extends TestCase
@@ -17,7 +17,7 @@ class BalanceTest extends TestCase
 
     public function testInvalidAmountForBalance(): void
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(InvalidBalance::class);
         $this->expectErrorMessage('Invalid amount for balance');
 
         new Balance(-1.0);

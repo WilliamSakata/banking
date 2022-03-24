@@ -2,7 +2,7 @@
 
 namespace Banking\Account\Model;
 
-use InvalidArgumentException;
+use Banking\Account\Model\errors\InvalidDocument;
 use PHPUnit\Framework\TestCase;
 
 class CpfTest extends TestCase
@@ -16,7 +16,7 @@ class CpfTest extends TestCase
     }
 
     public function testCreateFail():void {
-        static::expectException(InvalidArgumentException::class);
+        static::expectException(InvalidDocument::class);
         new Cpf(self::INVALID_CPF);
     }
 }

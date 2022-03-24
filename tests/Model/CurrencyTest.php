@@ -2,7 +2,7 @@
 
 namespace Banking\Account\Model;
 
-use LogicException;
+use Banking\Account\Model\errors\InvalidCurrency;
 use PHPUnit\Framework\TestCase;
 
 final class CurrencyTest extends TestCase
@@ -16,7 +16,7 @@ final class CurrencyTest extends TestCase
 
     public function testInvalidCurrency(): void
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(InvalidCurrency::class);
         $this->expectErrorMessage('Invalid currency xpto');
 
         new Currency('xpto');

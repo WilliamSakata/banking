@@ -2,7 +2,7 @@
 
 namespace Banking\Account\Model;
 
-use LogicException;
+use Banking\Account\Model\errors\DifferentCurrencies;
 use PHPUnit\Framework\TestCase;
 
 final class AmountTest extends TestCase
@@ -25,7 +25,7 @@ final class AmountTest extends TestCase
 
     public function testCurrenciesCannotBeDifferent(): void
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(DifferentCurrencies::class);
         $this->expectErrorMessage('Currencies cannot be different');
 
         $amount = new Amount(1.0, $this->brl);
