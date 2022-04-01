@@ -58,6 +58,9 @@ class Cpf implements Identity
         return true;
     }
 
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         return [

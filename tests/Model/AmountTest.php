@@ -14,6 +14,12 @@ final class AmountTest extends TestCase
         $this->brl = new Currency('BRL');
     }
 
+    /**
+     * @Given an amount
+     * @When a new amount with the same currency is added to the current amount
+     * @The current amount
+     * @Will have its value plus the amount added
+     */
     public function testAddValue(): void
     {
         $amount = new Amount(1.0, $this->brl);
@@ -23,6 +29,12 @@ final class AmountTest extends TestCase
         self::assertEquals($this->brl, $amount->getCurrency());
     }
 
+    /**
+     * @Given an amount
+     * @When a new amount with different currency is added to the current amount
+     * @An exception
+     * @Will be thrown
+     */
     public function testCurrenciesCannotBeDifferent(): void
     {
         $this->expectException(DifferentCurrencies::class);
@@ -32,6 +44,12 @@ final class AmountTest extends TestCase
         $amount->add(new Amount(0.1, new Currency('USD')));
     }
 
+    /**
+     * @Given an amount
+     * @When a new amount with the same currency is subbed from the current amount
+     * @Then the value of the current amount
+     * @Will be the value of the current amount minus the value of the new amount
+     */
     public function testSubValue(): void
     {
         $amount = new Amount(1.0, $this->brl);
@@ -41,6 +59,12 @@ final class AmountTest extends TestCase
         self::assertEquals($this->brl, $amount->getCurrency());
     }
 
+    /**
+     * @Given an amount
+     * @With value equals zero
+     * @Then the method isZero
+     * @Will return true
+     */
     public function testIsZero(): void
     {
         $amount = new Amount(0.0, $this->brl);

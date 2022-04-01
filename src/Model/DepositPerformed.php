@@ -39,16 +39,25 @@ class DepositPerformed implements DomainEvent
         return $this->financialTransaction;
     }
 
+    /**
+     * @return int
+     */
     public function getRevision(): int
     {
         return self::REVISION;
     }
 
+    /**
+     * @return string
+     */
     public function getAggregateType(): string
     {
         return self::AGGREGATE_TYPE;
     }
 
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         return [

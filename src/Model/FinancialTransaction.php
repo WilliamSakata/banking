@@ -46,6 +46,9 @@ final class FinancialTransaction implements ValueObject
         return $this->type;
     }
 
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         return [

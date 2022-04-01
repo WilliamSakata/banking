@@ -45,12 +45,13 @@ class DepositPerformedTest extends TestCase
         $this->expectException(InvalidFinancialTransactionType::class);
         $this->expectErrorMessage('Invalid financial transaction type D for DepositPerformed event');
 
-        $date = new DateTimeImmutable();
-        $document = new Cpf(self::CPF);
-        $amount = new Amount(10, new Currency('BRL'));
-        $financialTransaction = new FinancialTransaction($amount, $date, FinancialTransactionType::DEBIT);
+        $financialTransaction = new FinancialTransaction(
+            new Amount(10, new Currency('BRL')),
+            $this->occurredOn,
+            FinancialTransactionType::DEBIT
+        );
 
-        new DepositPerformed($document, $financialTransaction);
+        new DepositPerformed(new Cpf(self::CPF), $financialTransaction);
     }
 
     private function financialTransactionArray(): array
